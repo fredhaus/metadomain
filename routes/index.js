@@ -1,5 +1,10 @@
 var express = require("express");
 var router = express.Router();
+let {
+  get_epik_data,
+  get_gandi_data,
+  get_nameCom_data
+} = require("../api_calls");
 
 let test = [
   { name: "test1", price: 8.99, data: { price: "10.22", currency: "EUR" } },
@@ -14,8 +19,15 @@ router.get("/", function(req, res, next) {
 
 router.get("/result", function(req, res, next) {
   let domainName = req.query.domainSearch;
-  //res.json({ test, domainName });
-  res.render("result", { test, domainName });
+  let resultArrAll = [
+    get_epik_data(domainName),
+    get_gandi_data(domainName),
+    get_nameCom_data(domainName)
+  ];
+
+  Promise.all(resultArrAll).then(results => {
+    res.render("result", { results, domainName });
+  });
 });
 
 module.exports = router;
