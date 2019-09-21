@@ -1,2 +1,19 @@
 <h1>{{title}}</h1>
-<p>Welcome to {{title}}</p>
+
+<form action="/result">
+    <div class="form-group">
+        <div class="search">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">www.</span>
+                </div>
+                <input type="text" class="form-control" name="domainSearch" placeholder="Your Domain"
+                    aria-label="domainSearchQuery" aria-describedby="basic-addon1">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">.com</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button type="submit">New Search</button>
+</form>
