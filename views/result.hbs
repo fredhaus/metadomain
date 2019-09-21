@@ -1,0 +1,31 @@
+<form action="/result">
+    <div class="form-group">
+        <div class="search">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">www.</span>
+                </div>
+                <input type="text" class="form-control" name="domainSearch" placeholder="{{domainName}}"
+                    aria-label="domainSearchQuery" aria-describedby="basic-addon1">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">.com</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button type="submit">Next Search</button>
+</form>
+<div class="results">
+    {{#each test}}
+    <div class="card">
+        <h5 class="card-header">{{this.name}}</h5>
+        <div class="card-body">
+            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+            <div class="price">
+                <p>{{this.price}}</p>
+                <a href="#" class="btn btn-primary">Check offer!</a>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</div>
