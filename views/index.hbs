@@ -1,5 +1,13 @@
 <h1>{{title}}</h1>
+<h1>Welcome {{#if user}} {{user.email}} {{else}} Stranger {{/if}} !</h1>
 
+{{#if user}}
+<a href="/logout">Log out</a>
+{{else}}
+<a href="/login">Log in</a>
+<br>
+<a href="/signup">Sign up</a>
+{{/if}}
 <form action="/result">
     <div class="form-group">
         <div class="search">
