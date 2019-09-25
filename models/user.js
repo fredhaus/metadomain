@@ -7,7 +7,19 @@ const userSchema = new Schema(
     password: String, // required
     slackID: String,
     githubID: String,
-    facebookID: String
+    appleID: String,
+    searches: [
+      {
+        domain: String,
+        prices: [
+          {
+            ghandi: Number,
+            nameCom: Number,
+            epik: Number
+          }
+        ]
+      }
+    ]
   },
   {
     timestamps: true

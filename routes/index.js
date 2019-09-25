@@ -1,5 +1,6 @@
-var express = require("express");
-var router = express.Router();
+let express = require("express");
+let router = express.Router();
+const User = require("../models/user");
 let {
   get_epik_data,
   get_gandi_data,
@@ -14,7 +15,7 @@ let test = [
 
 /* GET home page. */
 router.get("/", function(req, res, next) {
-  res.render("index", { title: "Metadomain Search" });
+  res.render("index", { title: "Metadomain Search", user: req.user });
 });
 
 router.get("/result", function(req, res, next) {
@@ -28,6 +29,13 @@ router.get("/result", function(req, res, next) {
   Promise.all(resultArrAll).then(results => {
     res.render("result", { results, domainName });
   });
+  let currentSearch = {
+    domain: domainName
+  };
+  User.findOneAndUpdate(
+    { _id: req.user._id },
+    { $push: { searches: currentSearch } }
+  ).then(() => {});
 });
 
 module.exports = router;
