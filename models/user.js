@@ -11,13 +11,7 @@ const userSchema = new Schema(
     searches: [
       {
         domain: String,
-        prices: [
-          {
-            ghandi: Number,
-            nameCom: Number,
-            epik: Number
-          }
-        ]
+        price: Number
       }
     ]
   },

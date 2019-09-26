@@ -1,6 +1,18 @@
 let express = require("express");
 let router = express.Router();
 const User = require("../models/user");
+function findCheapest(domainObjects) {
+  let objectNumber = 0;
+  let cheapestPrice = domainObjects[objectNumber].price;
+  for (let counter = 1; counter < domainObjects.length; counter++) {
+    if (domainObjects[counter].price < cheapestPrice) {
+      cheapestPrice = domainObjects[counter].price;
+      objectNumber = counter;
+    } else {
+    }
+  }
+  return domainObjects[objectNumber];
+}
 let {
   get_epik_data,
   get_gandi_data,
@@ -25,17 +37,26 @@ router.get("/result", function(req, res, next) {
     get_gandi_data(domainName),
     get_nameCom_data(domainName)
   ];
-
-  Promise.all(resultArrAll).then(results => {
-    res.render("result", { results, domainName });
-  });
-  let currentSearch = {
-    domain: domainName
-  };
-  User.findOneAndUpdate(
-    { _id: req.user._id },
-    { $push: { searches: currentSearch } }
-  ).then(() => {});
+  Promise.all(resultArrAll)
+    .then(results => {
+      let bestResult = findCheapest(results);
+      res.render("result", { bestResult, domainName });
+      let currentSearch = {
+        domain: domainName,
+        price: bestResult.price
+      };
+      req.session.search = currentSearch;
+      return User.findOneAndUpdate(
+        { _id: req.user._id },
+        { $push: { searches: currentSearch } }
+      );
+    })
+    .then(result => {
+      console.log("Saved successfully");
+    })
+    .catch(error => {
+      console.log(error);
+    });
 });
 
 module.exports = router;
