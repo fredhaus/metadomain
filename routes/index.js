@@ -7,11 +7,11 @@ let {
   get_nameCom_data
 } = require("../api_calls");
 
-let test = [
-  { name: "test1", price: 8.99, data: { price: "10.22", currency: "EUR" } },
-  { name: "test2", price: 8.99, data: { price: "10.11", currency: "DOL" } },
-  { name: "test3", price: 8.99, data: { price: "10.11", currency: "DOL" } }
-];
+// let test = [
+//   { name: "test1", price: 8.99, data: { price: "10.22", currency: "EUR" } },
+//   { name: "test2", price: 8.99, data: { price: "10.11", currency: "DOL" } },
+//   { name: "test3", price: 8.99, data: { price: "10.11", currency: "DOL" } }
+// ];
 
 /* GET home page. */
 router.get("/", function(req, res, next) {
