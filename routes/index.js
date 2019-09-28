@@ -1,6 +1,8 @@
 let express = require("express");
 let router = express.Router();
 const User = require("../models/user");
+// Function gets array of objects as input (available suppliers) and compares their prices.
+// Then returns object of the cheapest supplier.
 function findCheapest(domainObjects) {
   let objectNumber = 0;
   let cheapestPrice = domainObjects[objectNumber].price;
@@ -13,17 +15,22 @@ function findCheapest(domainObjects) {
   }
   return domainObjects[objectNumber];
 }
+// Function gets array of API results (as objects) and checks whether they are marked as available.
+// Then returns a new array of objects only with available suppliers.
+function checkAvailabilty(domainObjects) {
+  let availabilityDomains = [];
+  domainObjects.forEach(element => {
+    if (element.available === true) {
+      availabilityDomains.push(element);
+    }
+  });
+  return availabilityDomains;
+}
 let {
   get_epik_data,
   get_gandi_data,
   get_nameCom_data
 } = require("../api_calls");
-
-// let test = [
-//   { name: "test1", price: 8.99, data: { price: "10.22", currency: "EUR" } },
-//   { name: "test2", price: 8.99, data: { price: "10.11", currency: "DOL" } },
-//   { name: "test3", price: 8.99, data: { price: "10.11", currency: "DOL" } }
-// ];
 
 /* GET home page. */
 router.get("/", function(req, res, next) {
@@ -39,13 +46,24 @@ router.get("/result", function(req, res, next) {
   ];
   Promise.all(resultArrAll)
     .then(results => {
-      let bestResult = findCheapest(results);
+      //Checking availability
+      let avaialbleResults = checkAvailabilty(results);
+      // Handling case of unavailability
+      let bestResult = {};
+      if (avaialbleResults.length > 0) {
+        // Finding cheapest option of potential alternatives
+        bestResult = findCheapest(avaialbleResults);
+      } else {
+        (bestResult.name = "Unavailable"), (bestResult.price = "0.00");
+      }
       res.render("result", { bestResult, domainName });
       let currentSearch = {
         domain: domainName,
         price: bestResult.price
       };
       req.session.search = currentSearch;
+      document.cookie = "searches=" + currentSearch;
+      console.log(document.cookie);
       return User.findOneAndUpdate(
         { _id: req.user._id },
         { $push: { searches: currentSearch } }

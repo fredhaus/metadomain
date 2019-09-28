@@ -34,13 +34,26 @@ router.post("/signup", (req, res, next) => {
 });
 
 // POST /login
-router.post(
-  "/login",
-  passport.authenticate("local", {
-    successRedirect: "/",
-    failureRedirect: "/login"
-  })
-);
+router.post("/login", (req, res, next) => {
+  passport.authenticate("local", (err, user) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.redirect("/login");
+    }
+    req.logIn(user, function(err) {
+      if (req.session.search) {
+        User.findOneAndUpdate(
+          { _id: req.user._id },
+          { $push: { searches: req.session.search } }
+        ).then(() => {
+          return res.redirect("/");
+        });
+      }
+    });
+  })(req, res, next);
+});
 
 // GET /logout
 router.get("/logout", (req, res, next) => {
