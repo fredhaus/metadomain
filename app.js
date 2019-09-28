@@ -1,12 +1,12 @@
+require("dotenv").config();
 let createError = require("http-errors");
 let express = require("express");
 let path = require("path");
 let cookieParser = require("cookie-parser");
 let logger = require("morgan");
 const mongoose = require("mongoose");
-mongoose.connect(process.env.MONGODB_URI);
 
-require("dotenv").config();
+mongoose.connect(process.env.MONGODB_URI);
 
 const session = require("express-session");
 const bcrypt = require("bcrypt");
