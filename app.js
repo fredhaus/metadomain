@@ -4,7 +4,9 @@ let path = require("path");
 let cookieParser = require("cookie-parser");
 let logger = require("morgan");
 const mongoose = require("mongoose");
-mongoose.connect(`mongodb://localhost/metadomain`);
+mongoose.connect(process.env.MONGODB_URI);
+
+require("dotenv").config();
 
 const session = require("express-session");
 const bcrypt = require("bcrypt");
