@@ -14,12 +14,16 @@
     "debug": "~2.6.9",
     "epik.com": "^1.0.0",
     "express": "~4.16.1",
+    "express-ip": "^1.0.3",
     "express-session": "^1.16.2",
     "hbs": "~4.0.4",
     "http-errors": "~1.6.3",
-    "morgan": "~1.9.1",
     "mongoose": "^5.7.1",
+    "morgan": "~1.9.1",
+    "namesilo-domain-api": "0.0.15",
+    "ngrok": "^3.2.5",
     "passport": "^0.4.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "request": "^2.88.0"
   }
 }

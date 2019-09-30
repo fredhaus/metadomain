@@ -1,5 +1,7 @@
 let createError = require("http-errors");
 let express = require("express");
+const expressip = require('express-ip');
+
 let path = require("path");
 let cookieParser = require("cookie-parser");
 let logger = require("morgan");
@@ -28,6 +30,8 @@ app.use(
     })
   })
 );
+
+app.use(expressip().getIpInfoMiddleware);
 
 require("./config/passport.js");
 app.use(passport.initialize());

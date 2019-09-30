@@ -18,6 +18,7 @@ let get_gandi_data = userInput => {
 
     if (response.data.products[0].status === "available") {
       responseObj = {
+        query: userInput,
         name: "gandi",
         data: response.data,
         price: response.data.products[0].prices[0].price_after_taxes,
@@ -25,9 +26,10 @@ let get_gandi_data = userInput => {
       };
     } else {
       responseObj = {
+        query: userInput,
         name: "gandi // not available",
         data: response.data,
-        price: 0,
+        price: 999999,
         available: false
       };
     }
@@ -64,6 +66,7 @@ let get_nameCom_data = userInput => {
         ) {
           // console.log(response.data.results);
           let responseObj = {
+            query: userInput,
             name: "nameCom",
             data: response.data,
             price: response.data.results[0].purchasePrice,
@@ -74,20 +77,23 @@ let get_nameCom_data = userInput => {
           return axiosCall();
         }
       } else if (
+        // not availble
         Object.keys(response.data).length !== 0 && //  >>>>>>> not empty
         response.data.results[0].domainName === userInput &&
         !response.data.results[0].purchasable
       ) {
         return {
+          query: userInput,
           name: "NameCom // not available",
-          price: 0.0,
+          price: 999999,
           data: { price: "0.00", currency: "EUR" },
           available: false
         };
       } else {
         return {
+          query: userInput,
           name: "NameCom // Unresponsive",
-          price: 0.0,
+          price: 999999,
           data: { price: "0.00", currency: "EUR" },
           available: false
         };
@@ -103,12 +109,11 @@ let get_epik_data = async userInput => {
   const EpikClient = new Epik("44F0-B9DB-DEAA-8200");
 
   return EpikClient.domains.checkAvailability(userInput).then(response => {
-    console.log(response.data);
-
     let responseObj = {};
 
     if (response.data.details.domain.available === true) {
       responseObj = {
+        query: userInput,
         name: "epik",
         data: response.data,
         price: response.data.details.domain.price,
@@ -116,9 +121,10 @@ let get_epik_data = async userInput => {
       };
     } else {
       responseObj = {
+        query: userInput,
         name: "epik // not available",
         data: response.data,
-        price: 0,
+        price: 999999,
         available: false
       };
     }
@@ -128,8 +134,50 @@ let get_epik_data = async userInput => {
 
 // _________________________________________________
 
+let find_alt_domains = domainSTL => { //to be continued
+  
+  // get nameCom overview
+  var dataString = { keyword: domainSTL };
+
+  var options = {
+    url: "https://api.dev.name.com/v4/domains:search",
+    method: "POST",
+    data: dataString,
+    auth: {
+      username: "frederikhausburg-test",
+      password: "d0b92716021ccb08093631646024c8f9d6b3073d"
+    }
+  };
+
+  return axios.request(options).then(response => {
+
+
+    responseArr = response.data.results
+    availArr = {}
+    responseArr.forEach(element => {
+      // console.log(element)
+      // console.log("__________")
+      // console.log(element.domainName)
+      // console.log("__________")
+      if(element.purchasable === true){
+        console.log(element.domainName)
+        console.log("__________")
+      }
+      // if(element.purchasable === true){
+      //   console.log(element)
+      // }
+    });
+    // console.log(response.data.results);
+  
+  });
+
+  // get epik altertatives with post array
+  // get gandi individual cheap domains
+};
+
 module.exports = {
   get_nameCom_data,
   get_gandi_data,
-  get_epik_data
+  get_epik_data,
+  find_alt_domains
 };
