@@ -1,6 +1,7 @@
 let express = require("express");
 let router = express.Router();
 const User = require("../models/user");
+let allSearches = [];
 // Function gets array of objects as input (available suppliers) and compares their prices.
 // Then returns object of the cheapest supplier.
 function findCheapest(domainObjects) {
@@ -40,7 +41,7 @@ router.get("/", function(req, res, next) {
 router.get("/result", function(req, res, next) {
   let domainName = req.query.domainSearch;
   let resultArrAll = [
-    get_epik_data(domainName),
+    //get_epik_data(domainName),
     get_gandi_data(domainName),
     get_nameCom_data(domainName)
   ];
@@ -61,9 +62,9 @@ router.get("/result", function(req, res, next) {
         domain: domainName,
         price: bestResult.price
       };
+      allSearches.push(currentSearch);
       req.session.search = currentSearch;
-      document.cookie = "searches=" + currentSearch;
-      console.log(document.cookie);
+      req.session.searches = allSearches;
       return User.findOneAndUpdate(
         { _id: req.user._id },
         { $push: { searches: currentSearch } }

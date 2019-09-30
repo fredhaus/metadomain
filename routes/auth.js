@@ -4,6 +4,7 @@ var router = express.Router();
 const bcrypt = require("bcrypt");
 const bcryptSalt = 10;
 const User = require("../models/user");
+const zxcvbn = require("zxcvbn");
 
 const passport = require("passport");
 
@@ -19,17 +20,43 @@ router.get("/signup", function(req, res, next) {
 
 // POST /signup
 router.post("/signup", (req, res, next) => {
-  const password = req.body.password;
-  const salt = bcrypt.genSaltSync(bcryptSalt);
-  const hashPass = bcrypt.hashSync(password, salt);
-
   let email = req.body.email;
+  const password = req.body.password;
+  if (email === "" || password === "") {
+    res.render("auth/signup", {
+      errorMessage: "Indicate username and password"
+    });
+    return;
+  } else if (zxcvbn(req.body.password).score < 2) {
+    res.render("auth/signup", { errorMessage: "Indicate stronger password" });
+  }
 
-  User.create({
-    email: email,
-    password: hashPass
-  }).then(() => {
-    res.redirect("/");
+  User.findOne({ email }).then(user => {
+    if (user !== null) {
+      res.render("auth/signup", {
+        errorMessage: "The username already exists"
+      });
+      return;
+    } else {
+      const salt = bcrypt.genSaltSync(bcryptSalt);
+      const hashPass = bcrypt.hashSync(password, salt);
+
+      User.create({
+        email: email,
+        password: hashPass
+      }).then((err, user) => {
+        passport.authenticate("local")(req, res, function() {
+          if (req.session.searches.length > 0) {
+            User.findOneAndUpdate(
+              { _id: req.user._id },
+              { $push: { searches: req.session.searches } }
+            ).then(() => {
+              res.redirect("/");
+            });
+          }
+        });
+      });
+    }
   });
 });
 
@@ -40,13 +67,16 @@ router.post("/login", (req, res, next) => {
       return next(err);
     }
     if (!user) {
-      return res.redirect("/login");
+      res.render("auth/login", {
+        errorMessage: "The username does not exist"
+      });
+      return;
     }
     req.logIn(user, function(err) {
-      if (req.session.search) {
+      if (req.session.searches.length > 0) {
         User.findOneAndUpdate(
           { _id: req.user._id },
-          { $push: { searches: req.session.search } }
+          { $push: { searches: req.session.searches } }
         ).then(() => {
           return res.redirect("/");
         });
