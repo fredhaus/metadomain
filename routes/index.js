@@ -120,10 +120,10 @@ router.get("/result", function(req, res, next) {
       // Saving Search in DB/User
       let currentSearch = {
         domain: domainName,
-        price: bestResult.price
+        price: bestQueryResult.price
       };
       req.session.search = currentSearch;
-      document.cookie = "searches=" + currentSearch;
+      document.cookie = "searches=" + currentSearch; ////////////////////////////////////////
       console.log(document.cookie);
       return User.findOneAndUpdate(
         { _id: req.user._id },
