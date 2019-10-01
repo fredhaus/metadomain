@@ -1,6 +1,8 @@
 let express = require("express");
 let router = express.Router();
 const User = require("../models/user");
+let allSearches = [];
+
 
 var axios = require("axios");
 let restCountryAll = require("../misc/restCountryAPI");
@@ -13,6 +15,7 @@ let {
 } = require("../api_calls");
 
 let line = "_____________________________"
+
 
 // Function gets array of objects as input (available suppliers) and compares their prices.
 // Then returns object of the cheapest supplier.
@@ -75,7 +78,7 @@ router.get("/result", function(req, res, next) {
   countrySpecificDomain = domainStl + ipSpecificTld
   
   let resultArrAll = [
-    get_epik_data(domainName),
+    //get_epik_data(domainName),
     get_gandi_data(domainName),
     get_nameCom_data(domainName),
     // get_namesilo_data(domainName),
@@ -129,9 +132,10 @@ router.get("/result", function(req, res, next) {
         domain: domainName,
         price: bestQueryResult.price
       };
+      allSearches.push(currentSearch);
       req.session.search = currentSearch;
-      document.cookie = "searches=" + currentSearch; ////////////////////////////////////////
-      console.log(document.cookie);
+      req.session.searches = allSearches;
+
       return User.findOneAndUpdate(
         { _id: req.user._id },
         { $push: { searches: currentSearch } }

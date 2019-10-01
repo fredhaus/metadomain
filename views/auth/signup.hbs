@@ -1,3 +1,6 @@
+{{#if errorMessage}}
+<div class="error-message">{{ errorMessage }}</div>
+{{/if}}
 <form action="/signup" method="post">
     <input type="text" name="email" placeholder="email">
     <br>
