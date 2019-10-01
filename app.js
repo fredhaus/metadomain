@@ -1,12 +1,14 @@
 require("dotenv").config();
 let createError = require("http-errors");
 let express = require("express");
+const expressip = require('express-ip');
+
 let path = require("path");
 let cookieParser = require("cookie-parser");
 let logger = require("morgan");
 const mongoose = require("mongoose");
 
-mongoose.connect(process.env.MONGODB_URI);
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const session = require("express-session");
 const bcrypt = require("bcrypt");
@@ -30,6 +32,8 @@ app.use(
     })
   })
 );
+
+app.use(expressip().getIpInfoMiddleware);
 
 require("./config/passport.js");
 app.use(passport.initialize());
