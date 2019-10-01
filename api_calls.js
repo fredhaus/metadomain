@@ -1,11 +1,13 @@
 var axios = require("axios");
 const Epik = require("./node_modules/epik.com");
+const NameSilo = require('namesilo-domain-api')
+const secrets = require('./api_secrets/api_secrets')
 
 // Gandi _________________________________________________
 
 let get_gandi_data = userInput => {
   const headers = {
-    authorization: "Apikey u74Ptic6ozNFCIgPNnHxD5W"
+    authorization: "Apikey " + secrets.gandi
   };
 
   const options = {
@@ -47,8 +49,8 @@ let get_nameCom_data = userInput => {
     method: "POST",
     data: dataString,
     auth: {
-      username: "frederikhausburg-test",
-      password: "d0b92716021ccb08093631646024c8f9d6b3073d"
+      username: secrets.nameComUser,
+      password: secrets.nameComPW
     }
   };
 
@@ -106,7 +108,7 @@ let get_nameCom_data = userInput => {
 // EPIK _________________________________________________
 
 let get_epik_data = async userInput => {
-  const EpikClient = new Epik("44F0-B9DB-DEAA-8200");
+  const EpikClient = new Epik(secrets.epik);
 
   return EpikClient.domains.checkAvailability(userInput).then(response => {
     let responseObj = {};
@@ -133,6 +135,39 @@ let get_epik_data = async userInput => {
 };
 
 // _________________________________________________
+
+let get_namesilo_data = userInput =>{
+
+  let ns = new NameSilo(secrets.namesilo)
+  let responseObj = {}
+
+  return ns.checkRegisterAvailability([userInput]).then(resp=>{
+    if(resp.available){
+      responseObj = {
+        query: userInput,
+        name: "namesilo",
+        price: resp.available.domain.price,
+        data: resp,
+        available: true
+        }
+        console.log(responseObj)
+
+      } 
+    else {
+      responseObj = {
+        query: userInput,
+        name: "namesilo // not available",
+        data: resp,
+        price: 999999,
+        available: false
+        }
+      }
+
+  }).catch(err=>{
+    console.error(err)
+  })
+
+}
 
 let find_alt_domains = domainSTL => { //to be continued
   
@@ -179,5 +214,6 @@ module.exports = {
   get_nameCom_data,
   get_gandi_data,
   get_epik_data,
-  find_alt_domains
+  find_alt_domains,
+  get_namesilo_data
 };

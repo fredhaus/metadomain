@@ -7,7 +7,8 @@ let {
   get_epik_data,
   get_gandi_data,
   get_nameCom_data,
-  find_alt_domains
+  find_alt_domains, 
+  get_namesilo_data
 } = require("../api_calls");
 
 let line = "_____________________________"
@@ -70,9 +71,12 @@ router.get("/result", function(req, res, next) {
     get_epik_data(domainName),
     get_gandi_data(domainName),
     get_nameCom_data(domainName),
+    get_namesilo_data(domainName),
     get_epik_data(countrySpecificDomain),
     get_gandi_data(countrySpecificDomain),
+    get_nameCom_data(countrySpecificDomain),
     get_nameCom_data(countrySpecificDomain)
+    
   ];
 
   Promise.all(resultArrAll)
