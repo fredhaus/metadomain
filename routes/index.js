@@ -78,16 +78,18 @@ router.get("/result", function(req, res, next) {
     get_epik_data(domainName),
     get_gandi_data(domainName),
     get_nameCom_data(domainName),
-    get_namesilo_data(domainName),
+    // get_namesilo_data(domainName),
     get_epik_data(countrySpecificDomain),
     get_gandi_data(countrySpecificDomain),
     get_nameCom_data(countrySpecificDomain),
-    get_nameCom_data(countrySpecificDomain)
+    // get_namesilo_data(countrySpecificDomain),
     
   ];
 
   Promise.all(resultArrAll)
     .then(results => {
+      
+      console.log(results)
 
       // cheapest Query Result
       let QueryResult = results.filter(function( obj ) {
@@ -103,13 +105,14 @@ router.get("/result", function(req, res, next) {
       let avaialblecountrySpecificResult = checkAvailabilty(countrySpecificResult);
 
       // Handling case of unavailability // query
+      bestQueryResult = {}
       if (avaialbleQueryResults.length > 0) {
         // Finding cheapest option of potential alternatives
         bestQueryResult = findCheapest(avaialbleQueryResults);
       } else {
         (bestQueryResult.name = "Unavailable"), (bestQueryResult.price = "0.00");
       }
-
+      bestCountrySpecificResult = {}
       // Handling case of unavailability // country specific
       if (avaialblecountrySpecificResult.length > 0) {
         // Finding cheapest option of potential alternatives

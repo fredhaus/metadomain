@@ -150,7 +150,7 @@ let get_namesilo_data = userInput =>{
         data: resp,
         available: true
         }
-        console.log(responseObj)
+        
 
       } 
     else {
