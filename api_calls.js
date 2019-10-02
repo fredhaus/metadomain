@@ -1,13 +1,13 @@
 var axios = require("axios");
+require("dotenv").config();
 const Epik = require("./node_modules/epik.com");
 const NameSilo = require('namesilo-domain-api')
-const secrets = require('./api_secrets/api_secrets')
 
 // Gandi _________________________________________________
 
 let get_gandi_data = userInput => {
   const headers = {
-    authorization: "Apikey " + secrets.gandi
+    authorization: "Apikey " + process.env.GANDI
   };
 
   const options = {
@@ -49,8 +49,8 @@ let get_nameCom_data = userInput => {
     method: "POST",
     data: dataString,
     auth: {
-      username: secrets.nameComUser,
-      password: secrets.nameComPW
+      username: process.env.NAMECOMUSER,
+      password: process.env.NAMECOMPW
     }
   };
 
@@ -108,7 +108,7 @@ let get_nameCom_data = userInput => {
 // EPIK _________________________________________________
 
 let get_epik_data = async userInput => {
-  const EpikClient = new Epik(secrets.epik);
+  const EpikClient = new Epik(process.env.EPIK);
 
   return EpikClient.domains.checkAvailability(userInput).then(response => {
     let responseObj = {};
