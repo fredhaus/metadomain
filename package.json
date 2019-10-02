@@ -25,7 +25,8 @@
     "ngrok": "^3.2.5",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
-    "zxcvbn": "^4.4.2",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
+    "zxcvbn": "^4.4.2"
   }
 }

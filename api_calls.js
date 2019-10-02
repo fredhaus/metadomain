@@ -1,7 +1,9 @@
 var axios = require("axios");
 require("dotenv").config();
 const Epik = require("./node_modules/epik.com");
-const NameSilo = require('namesilo-domain-api')
+const NameSilo = require("namesilo-domain-api");
+const request = require("request-promise");
+const fixieRequest = request.defaults({ proxy: process.env.FIXIE_URL });
 
 // Gandi _________________________________________________
 
@@ -106,71 +108,113 @@ let get_nameCom_data = userInput => {
 };
 
 // EPIK _________________________________________________
+let get_epik_data = userInput => {
+  var headers = {
+    accept: "application/json",
+    "content-type": "application/json"
+  };
 
-let get_epik_data = async userInput => {
-  const EpikClient = new Epik(process.env.EPIK);
+  var options = {
+    url:
+      "https://usersapiv2.epik.com/v2/domains/check?SIGNATURE=" +
+      process.env.EPIK +
+      "&DOMAINS=" +
+      userInput,
+    headers: headers
+  };
 
-  return EpikClient.domains.checkAvailability(userInput).then(response => {
+  let userInputUpperCase = userInput.toUpperCase();
+
+  return fixieRequest(options.url).then(response => {
+
+    // console.log(response)
+    // console.log(JSON.parse(response))
+    // console.log(JSON.parse(response).data[userInputUpperCase])
+    // console.log("_______________")
+
     let responseObj = {};
-
-    if (response.data.details.domain.available === true) {
-      responseObj = {
+    if (JSON.parse(response).data[userInputUpperCase].available === 1) {
+      return responseObj = {
         query: userInput,
-        name: "epik",
-        data: response.data,
-        price: response.data.details.domain.price,
+        name: "Epik",
+        price: JSON.parse(response).data[userInputUpperCase].price,
+        data: JSON.parse(response).data,
         available: true
       };
     } else {
-      responseObj = {
+      return responseObj = {
         query: userInput,
-        name: "epik // not available",
-        data: response.data,
-        price: 999999,
+        name: "Epik // not available",
+        price: 99999,
+        data: JSON.parse(response).data,
         available: false
       };
     }
-    return responseObj;
   });
 };
 
+// let get_epik_data = async userInput => {
+//   const EpikClient = new Epik(process.env.EPIK);
+
+//   return EpikClient.domains.checkAvailability(userInput).then(response => {
+//     let responseObj = {};
+
+//     if (response.data.details.domain.available === true) {
+//       responseObj = {
+//         query: userInput,
+//         name: "epik",
+//         data: response.data,
+//         price: response.data.details.domain.price,
+//         available: true
+//       };
+//     } else {
+//       responseObj = {
+//         query: userInput,
+//         name: "epik // not available",
+//         data: response.data,
+//         price: 999999,
+//         available: false
+//       };
+//     }
+//     return responseObj;
+//   });
+// };
+
 // _________________________________________________
 
-let get_namesilo_data = userInput =>{
+let get_namesilo_data = userInput => {
+  let ns = new NameSilo(process.env.NAMESILO);
+  let responseObj = {};
 
-  let ns = new NameSilo(process.env.NAMESILO)
-  let responseObj = {}
-
-  return ns.checkRegisterAvailability([userInput]).then(resp=>{
-    if(resp.available){
-      responseObj = {
-        query: userInput,
-        name: "namesilo",
-        price: resp.available.domain.price,
-        data: resp,
-        available: true
-        }
-
-
-      } 
-    else {
-      responseObj = {
-        query: userInput,
-        name: "namesilo // not available",
-        data: resp,
-        price: 999999,
-        available: false
-        }
+  return ns
+    .checkRegisterAvailability([userInput])
+    .then(resp => {
+      if (resp.available) {
+        responseObj = {
+          query: userInput,
+          name: "namesilo",
+          price: resp.available.domain.price,
+          data: resp,
+          available: true
+        };
+      } else {
+        responseObj = {
+          query: userInput,
+          name: "namesilo // not available",
+          data: resp,
+          price: 999999,
+          available: false
+        };
       }
+    })
+    .catch(err => {
+      console.error(err);
+    });
+};
 
-  }).catch(err=>{
-    console.error(err)
-  })
+let find_alt_domains = domainSTL => {
+  //to be continued
 
-}
-
-let find_alt_domains = domainSTL => { //to be continued
-  
   // get nameCom overview
   var dataString = { keyword: domainSTL };
 
@@ -185,25 +229,22 @@ let find_alt_domains = domainSTL => { //to be continued
   };
 
   return axios.request(options).then(response => {
-
-
-    responseArr = response.data.results
-    availArr = {}
+    responseArr = response.data.results;
+    availArr = {};
     responseArr.forEach(element => {
       // console.log(element)
       // console.log("__________")
       // console.log(element.domainName)
       // console.log("__________")
-      if(element.purchasable === true){
-        console.log(element.domainName)
-        console.log("__________")
+      if (element.purchasable === true) {
+        console.log(element.domainName);
+        console.log("__________");
       }
       // if(element.purchasable === true){
       //   console.log(element)
       // }
     });
     // console.log(response.data.results);
-  
   });
 
   // get epik altertatives with post array
