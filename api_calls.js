@@ -138,7 +138,7 @@ let get_epik_data = async userInput => {
 
 let get_namesilo_data = userInput =>{
 
-  let ns = new NameSilo(secrets.namesilo)
+  let ns = new NameSilo(process.env.NAMESILO)
   let responseObj = {}
 
   return ns.checkRegisterAvailability([userInput]).then(resp=>{
@@ -150,7 +150,7 @@ let get_namesilo_data = userInput =>{
         data: resp,
         available: true
         }
-        
+
 
       } 
     else {

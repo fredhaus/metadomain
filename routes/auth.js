@@ -10,11 +10,18 @@ const passport = require("passport");
 
 // GET /login
 router.get("/login", function(req, res, next) {
+  if (!req.session.searches) {
+    req.session.searches = [];
+  }
+
   res.render("auth/login");
 });
 
 // GET /signup
 router.get("/signup", function(req, res, next) {
+  if (!req.session.searches) {
+    req.session.searches = [];
+  }
   res.render("auth/signup");
 });
 
@@ -44,16 +51,14 @@ router.post("/signup", (req, res, next) => {
       User.create({
         email: email,
         password: hashPass
-      }).then((err, user) => {
-        passport.authenticate("local")(req, res, function() {
-          if (req.session.searches.length > 0) {
-            User.findOneAndUpdate(
-              { _id: req.user._id },
-              { $push: { searches: req.session.searches } }
-            ).then(() => {
-              res.redirect("/");
-            });
-          }
+      }).then((user) => {
+        req.logIn(user, function(err) {
+          User.findOneAndUpdate(
+            { _id: req.user._id },
+            { $push: { searches: req.session.searches } }
+          ).then(() => {
+            res.redirect("/");
+          });
         });
       });
     }
@@ -73,14 +78,12 @@ router.post("/login", (req, res, next) => {
       return;
     }
     req.logIn(user, function(err) {
-      if (req.session.searches.length > 0) {
-        User.findOneAndUpdate(
-          { _id: req.user._id },
-          { $push: { searches: req.session.searches } }
-        ).then(() => {
-          return res.redirect("/");
-        });
-      }
+      User.findOneAndUpdate(
+        { _id: req.user._id },
+        { $push: { searches: req.session.searches } }
+      ).then(() => {
+        return res.redirect("/");
+      });
     });
   })(req, res, next);
 });

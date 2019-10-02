@@ -47,6 +47,10 @@ function checkAvailabilty(domainObjects) {
 /* GET home page. */
 router.get("/", function(req, res, next) {
   res.render("index", { title: "Metadomain Search", user: req.user });
+  if(!req.session.searches){
+    req.session.searches = []
+  }
+
 });
 
 // router.get('/ipinfo', function (req, res) {
@@ -58,6 +62,10 @@ router.get("/", function(req, res, next) {
 // });
 
 router.get("/result", function(req, res, next) {
+  if(!req.session.searches){
+    req.session.searches = []
+  }
+  
   let domainName = req.query.domainSearch;
 
   //splitting searched domain by the dot
