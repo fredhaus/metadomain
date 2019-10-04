@@ -27,6 +27,7 @@ router.get("/signup", function(req, res, next) {
 
 // POST /signup
 router.post("/signup", (req, res, next) => {
+  let reeamil = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,6})?$/;
   let email = req.body.email;
   const password = req.body.password;
   if (email === "" || password === "") {
@@ -34,9 +35,16 @@ router.post("/signup", (req, res, next) => {
       errorMessage: "Indicate username and password"
     });
     return;
-  } else if (zxcvbn(req.body.password).score < 2) {
+  } 
+  else if (!reeamil.test(email)){
+    res.render("auth/signup", {
+      errorMessage: "Please enter valid email address"
+    });
+  }
+  else if (zxcvbn(req.body.password).score < 2) {
     res.render("auth/signup", { errorMessage: "Indicate stronger password" });
   }
+
 
   User.findOne({ email }).then(user => {
     if (user !== null) {

@@ -189,8 +189,9 @@ let get_namesilo_data = userInput => {
   return ns
     .checkRegisterAvailability([userInput])
     .then(resp => {
+      console.log(resp)
       if (resp.available) {
-        responseObj = {
+        return responseObj = {
           query: userInput,
           name: "namesilo",
           price: resp.available.domain.price,
@@ -198,7 +199,7 @@ let get_namesilo_data = userInput => {
           available: true
         };
       } else {
-        responseObj = {
+        return responseObj = {
           query: userInput,
           name: "namesilo // not available",
           data: resp,

@@ -89,11 +89,11 @@ router.get("/result", function(req, res, next) {
     get_epik_data(domainName),
     get_gandi_data(domainName),
     get_nameCom_data(domainName),
-    // get_namesilo_data(domainName),
-    // get_epik_data(countrySpecificDomain),
+    get_namesilo_data(domainName),
+    get_epik_data(countrySpecificDomain),
     get_gandi_data(countrySpecificDomain),
     get_nameCom_data(countrySpecificDomain),
-    // get_namesilo_data(countrySpecificDomain),
+    get_namesilo_data(countrySpecificDomain),
     
   ];
 
@@ -102,7 +102,7 @@ router.get("/result", function(req, res, next) {
       
       // console.log(JSON.stringify(results))
       console.log(results)
-      
+
       // cheapest Query Result
       let QueryResult = results.filter(function( obj ) {
         return obj.query === domainName
