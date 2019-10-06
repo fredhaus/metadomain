@@ -107,51 +107,60 @@ let get_nameCom_data = userInput => {
   return axiosCall();
 };
 
-// EPIK _________________________________________________
-let get_epik_data = userInput => {
-  var headers = {
-    accept: "application/json",
-    "content-type": "application/json"
-  };
+// // EPIK _________________________________________________
 
-  var options = {
-    url:
-      "https://usersapiv2.epik.com/v2/domains/check?SIGNATURE=" +
-      process.env.EPIK +
-      "&DOMAINS=" +
-      userInput,
-    headers: headers
-  };
 
-  let userInputUpperCase = userInput.toUpperCase();
 
-  return fixieRequest(options.url).then(response => {
+// let get_epik_data = userInput => {
+ 
+//   var headers = {
+//     accept: "application/json",
+//     "content-type": "application/json"
+//   };
 
-    // console.log(response)
-    // console.log(JSON.parse(response))
-    // console.log(JSON.parse(response).data[userInputUpperCase])
-    // console.log("_______________")
+//   var options = {
+//     url:
+//       "https://usersapiv2.epik.com/v2/domains/check?SIGNATURE=" +
+//       process.env.EPIK +
+//       "&DOMAINS=" +
+//       userInput,
+//     headers: headers
+//   };
 
-    let responseObj = {};
-    if (JSON.parse(response).data[userInputUpperCase].available === 1) {
-      return responseObj = {
-        query: userInput,
-        name: "Epik",
-        price: JSON.parse(response).data[userInputUpperCase].price,
-        data: JSON.parse(response).data,
-        available: true
-      };
-    } else {
-      return responseObj = {
-        query: userInput,
-        name: "Epik // not available",
-        price: 99999,
-        data: JSON.parse(response).data,
-        available: false
-      };
-    }
-  });
-};
+//   let userInputUpperCase = userInput.toUpperCase();
+
+ 
+//   return fixieRequest(options.url).then(response => {
+    
+//     // console.log(response)
+//     // console.log(JSON.parse(response))
+//     // console.log(JSON.parse(response).data[userInputUpperCase])
+//     // console.log("_______________")
+
+//     let responseObj = {};
+
+//     if (JSON.parse(response).data[userInputUpperCase]){
+//       if (JSON.parse(response).data[userInputUpperCase].available === 1) {
+//         return responseObj = {
+//           query: userInput,
+//           name: "Epik",
+//           price: JSON.parse(response).data[userInputUpperCase].price,
+//           data: JSON.parse(response).data,
+//           available: true
+//         };
+//     }
+
+//     } else {
+//       return responseObj = {
+//         query: userInput,
+//         name: "Epik // not available",
+//         price: 99999,
+//         data: JSON.parse(response).data,
+//         available: false
+//       };
+//     }
+//   }); 
+// };
 
 // let get_epik_data = async userInput => {
 //   const EpikClient = new Epik(process.env.EPIK);
@@ -189,7 +198,6 @@ let get_namesilo_data = userInput => {
   return ns
     .checkRegisterAvailability([userInput])
     .then(resp => {
-      console.log(resp)
       if (resp.available) {
         return responseObj = {
           query: userInput,
@@ -255,7 +263,7 @@ let find_alt_domains = domainSTL => {
 module.exports = {
   get_nameCom_data,
   get_gandi_data,
-  get_epik_data,
+  // get_epik_data,
   find_alt_domains,
   get_namesilo_data
 };

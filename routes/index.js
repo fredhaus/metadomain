@@ -3,19 +3,17 @@ let router = express.Router();
 const User = require("../models/user");
 let allSearches = [];
 
-
 var axios = require("axios");
 let restCountryAll = require("../misc/restCountryAPI");
 let {
-  get_epik_data,
+  // get_epik_data,
   get_gandi_data,
   get_nameCom_data,
-  find_alt_domains, 
+  find_alt_domains,
   get_namesilo_data
 } = require("../api_calls");
 
-let line = "_____________________________"
-
+let line = "_____________________________";
 
 // Function gets array of objects as input (available suppliers) and compares their prices.
 // Then returns object of the cheapest supplier.
@@ -43,14 +41,12 @@ function checkAvailabilty(domainObjects) {
   return availabilityDomains;
 }
 
-
 /* GET home page. */
 router.get("/", function(req, res, next) {
   res.render("index", { title: "Metadomain Search", user: req.user });
-  if(!req.session.searches){
-    req.session.searches = []
+  if (!req.session.searches) {
+    req.session.searches = [];
   }
-
 });
 
 // router.get('/ipinfo', function (req, res) {
@@ -62,100 +58,117 @@ router.get("/", function(req, res, next) {
 // });
 
 router.get("/result", function(req, res, next) {
-  if(!req.session.searches){
-    req.session.searches = []
+  if (!req.session.searches) {
+    req.session.searches = [];
   }
-  
   let domainName = req.query.domainSearch;
 
-  //splitting searched domain by the dot
-  let domainNameArr = domainName.split(".");
-  let domainStl = domainNameArr[0];
+  // domain input verification >> string.string
 
-  // IpInfo ________
-  const ipInfo = req.ipInfo;
-  const ipInfoCountryCode = ipInfo.country;
-  // console.log("Current User is located in " + ipInfo.country, "City: " + ipInfo.city)
-  
-  // looking up domain ending for IP-Country ________________
-  let ipSpecificTld = restCountryAll.find(
-    ({ alpha2Code }) => alpha2Code === ipInfoCountryCode
-  ).topLevelDomain[0];
+  if (domainName.match(/^[a-zA-Z0-9-]+\.[a-zA-Z0-9]+$/) === null) {
+    let errorMessage = '"' + domainName + '" is not a valid search term. Please try again in the format of domain.ending'
+    res.render("index", { domainName, errorMessage });
+  } else {
+    let domainName = req.query.domainSearch;
 
-  // assembling country/ip-specific new domain
-  countrySpecificDomain = domainStl + ipSpecificTld
-  
-  let resultArrAll = [
-    get_epik_data(domainName),
-    get_gandi_data(domainName),
-    get_nameCom_data(domainName),
-    get_namesilo_data(domainName),
-    get_epik_data(countrySpecificDomain),
-    get_gandi_data(countrySpecificDomain),
-    get_nameCom_data(countrySpecificDomain),
-    get_namesilo_data(countrySpecificDomain),
-    
-  ];
+    //splitting searched domain by the dot
+    let domainNameArr = domainName.split(".");
+    let domainStl = domainNameArr[0];
 
-  Promise.all(resultArrAll)
-    .then(results => {
-      
-      // console.log(JSON.stringify(results))
-      console.log(results)
+    // IpInfo ________
+    const ipInfo = req.ipInfo;
+    const ipInfoCountryCode = ipInfo.country;
+    // console.log("Current User is located in " + ipInfo.country, "City: " + ipInfo.city)
 
-      // cheapest Query Result
-      let QueryResult = results.filter(function( obj ) {
-        return obj.query === domainName
-    })
-      // cheapest countrySpecific Result
-      let countrySpecificResult = results.filter(function( obj ) {
-        return obj.query === countrySpecificDomain
-    })
-      
-      //Checking availability
-      let avaialbleQueryResults = checkAvailabilty(QueryResult);
-      let avaialblecountrySpecificResult = checkAvailabilty(countrySpecificResult);
+    // looking up domain ending for IP-Country ________________
+    let ipSpecificTld = restCountryAll.find(
+      ({ alpha2Code }) => alpha2Code === ipInfoCountryCode
+    ).topLevelDomain[0];
 
-      // Handling case of unavailability // query
-      bestQueryResult = {}
-      if (avaialbleQueryResults.length > 0) {
-        // Finding cheapest option of potential alternatives
-        bestQueryResult = findCheapest(avaialbleQueryResults);
-      } else {
-        (bestQueryResult.name = "Unavailable"), (bestQueryResult.price = "0.00");
-      }
-      bestCountrySpecificResult = {}
-      // Handling case of unavailability // country specific
-      if (avaialblecountrySpecificResult.length > 0) {
-        // Finding cheapest option of potential alternatives
-        bestCountrySpecificResult = findCheapest(avaialblecountrySpecificResult);
-      } else {
-        (bestCountrySpecificResult.name = "Unavailable"), (bestCountrySpecificResult.price = "0.00");
-      }      
+    // assembling country/ip-specific new domain
+    countrySpecificDomain = domainStl + ipSpecificTld;
 
-      // rendering result page
-      res.render("result", { bestQueryResult, bestCountrySpecificResult, domainName, countrySpecificDomain});
+    let resultArrAll = [
+      // get_epik_data(domainName),
+      get_gandi_data(domainName),
+      get_nameCom_data(domainName),
+      get_namesilo_data(domainName),
+      // get_epik_data(countrySpecificDomain),
+      get_gandi_data(countrySpecificDomain),
+      get_nameCom_data(countrySpecificDomain),
+      get_namesilo_data(countrySpecificDomain)
+    ];
 
-      // Saving Search in DB/User
-      let currentSearch = {
-        domain: domainName,
-        price: bestQueryResult.price
-      };
-      allSearches.push(currentSearch);
-      req.session.search = currentSearch;
-      req.session.searches = allSearches;
+    Promise.all(resultArrAll)
+      .then(results => {
+        // console.log(JSON.stringify(results))
+        console.log(results);
 
-      return User.findOneAndUpdate(
-        { _id: req.user._id },
-        { $push: { searches: currentSearch } }
-      );
-    })
-    .then(result => {
-      console.log("Saved successfully");
-    })
-    .catch(error => {
-      console.log(error);
-    });
+        // cheapest Query Result
+        let QueryResult = results.filter(function(obj) {
+          return obj.query === domainName;
+        });
+        // cheapest countrySpecific Result
+        let countrySpecificResult = results.filter(function(obj) {
+          return obj.query === countrySpecificDomain;
+        });
+
+        //Checking availability
+        let avaialbleQueryResults = checkAvailabilty(QueryResult);
+        let avaialblecountrySpecificResult = checkAvailabilty(
+          countrySpecificResult
+        );
+
+        // Handling case of unavailability // query
+        bestQueryResult = {};
+        if (avaialbleQueryResults.length > 0) {
+          // Finding cheapest option of potential alternatives
+          bestQueryResult = findCheapest(avaialbleQueryResults);
+        } else {
+          (bestQueryResult.name = "Unavailable"),
+            (bestQueryResult.price = "0.00");
+        }
+        bestCountrySpecificResult = {};
+        // Handling case of unavailability // country specific
+        if (avaialblecountrySpecificResult.length > 0) {
+          // Finding cheapest option of potential alternatives
+          bestCountrySpecificResult = findCheapest(
+            avaialblecountrySpecificResult
+          );
+        } else {
+          (bestCountrySpecificResult.name = "Unavailable"),
+            (bestCountrySpecificResult.price = "0.00");
+        }
+
+        // rendering result page
+        res.render("result", {
+          bestQueryResult,
+          bestCountrySpecificResult,
+          domainName,
+          countrySpecificDomain
+        });
+
+        // Saving Search in DB/User
+        let currentSearch = {
+          domain: domainName,
+          price: bestQueryResult.price
+        };
+        allSearches.push(currentSearch);
+        req.session.search = currentSearch;
+        req.session.searches = allSearches;
+
+        return User.findOneAndUpdate(
+          { _id: req.user._id },
+          { $push: { searches: currentSearch } }
+        );
+      })
+      .then(result => {
+        console.log("Saved successfully");
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
 });
 
 module.exports = router;

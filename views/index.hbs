@@ -1,6 +1,8 @@
 <h1>{{title}}</h1>
 <h1>Welcome {{#if user}} {{user.email}} {{else}} Stranger {{/if}} !</h1>
 
+
+
 {{#if user}}
 <a href="/logout">Log out</a>
 {{else}}
@@ -8,6 +10,11 @@
 <br>
 <a href="/signup">Sign up</a>
 {{/if}}
+
+{{#if errorMessage}}
+<div class="error-message">{{ errorMessage }}</div>
+{{/if}}
+
 <form action="/result">
     <div class="form-group">
         <div class="search">
@@ -15,7 +22,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">www.</span>
                 </div>
-                <input type="text" class="form-control" name="domainSearch" placeholder="Your Domain"
+                <input type="text" class="form-control" name="domainSearch" placeholder="example.com"
                     aria-label="domainSearchQuery" aria-describedby="basic-addon1">
             </div>
         </div>
