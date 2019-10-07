@@ -21,7 +21,7 @@ let oneUSDtoEUR = () => {
 // Gandi _________________________________________________
 
 let get_gandi_data = userInput => {
-  console.log("gandi __________________")
+
   const headers = {
     authorization: "Apikey " + process.env.GANDI
   };
@@ -129,12 +129,13 @@ let get_namesilo_data = userInput => {
     return ns
       .checkRegisterAvailability([userInput])
       .then(resp => {
-        console.log(resp);
+        
         if (resp.available) {
+          // console.log(parseFloat(resp.available.domain.price));
           return (responseObj = {
             query: userInput,
             name: "namesilo",
-            price: resp.available.domain.price, 
+            price: parseFloat(resp.available.domain.price),//resp.available.domain.price, 
             data: resp,
             available: true
           });

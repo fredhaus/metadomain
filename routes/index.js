@@ -90,8 +90,7 @@ router.get("/result", function(req, res, next) {
 
   Promise.all(resultArrAll)
     .then(results => {
-      // console.log(JSON.stringify(results))
-      // console.log(results)
+      console.log(results)
 
       // convert NameCom & namesilo USD to EUR
 
