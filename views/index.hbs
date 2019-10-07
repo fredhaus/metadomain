@@ -2,7 +2,9 @@
 <h1>Welcome {{#if user}} {{user.email}} {{else}} Stranger {{/if}} !</h1>
 
 {{#if user}}
-<a href="/logout">Log out</a>
+<a href="/logout">Log out</a><br>
+
+<a href="/user">My searches</a>
 {{else}}
 <a href="/login">Log in</a>
 <br>

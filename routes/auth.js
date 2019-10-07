@@ -44,7 +44,6 @@ router.post("/signup", (req, res, next) => {
   }
   else if (zxcvbn(req.body.password).score < 2) {
     
-    console.log(zxcvbn(req.body.password).feedback)
     let warning = zxcvbn(req.body.password).feedback.warning
     let suggestion = zxcvbn(req.body.password).feedback.suggestions[0]
 
@@ -106,6 +105,19 @@ router.post("/login", (req, res, next) => {
 router.get("/logout", (req, res, next) => {
   req.logOut();
   res.redirect("/");
+});
+
+
+// GET /user
+router.get("/user", (req, res, next) => {
+  if(req.user){
+    searchesObj = req.user.searches
+    // res.locals.currentUser = req.user;
+    res.render("auth/user", {searchesObj: searchesObj})
+  }
+  else{
+    res.redirect("/login")
+  }
 });
 
 module.exports = router;

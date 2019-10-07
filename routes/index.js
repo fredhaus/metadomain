@@ -113,7 +113,7 @@ router.get("/result", function(req, res, next) {
         }
       });
 
-      console.log(results)
+      // console.log(results)
 
       // cheapest Query Result
       let QueryResult = results.filter(function( obj ) {
@@ -149,13 +149,29 @@ router.get("/result", function(req, res, next) {
       res.render("result", { bestQueryResult, bestCountrySpecificResult, domainName, countrySpecificDomain});
 
       // Saving Search in DB/User
+
+      let today = new Date();
+      let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+      let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+      let timestamp = Date.now()
+
       let currentSearch = {
         domain: domainName,
-        price: bestQueryResult.price
+        price: bestQueryResult.price,
+        host: bestQueryResult.name,
+        available: bestQueryResult.available,
+        timestamp: timestamp,
+        SearchDate: date,
+        SearchTime: time
       };
+
+      // console.log(currentSearch)
       allSearches.push(currentSearch);
       req.session.search = currentSearch;
       req.session.searches = allSearches;
+
+      console.log(currentSearch)
+
 
       return User.findOneAndUpdate(
         { _id: req.user._id },
