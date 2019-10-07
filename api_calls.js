@@ -5,9 +5,23 @@ const NameSilo = require("namesilo-domain-api");
 const request = require("request-promise");
 const fixieRequest = request.defaults({ proxy: process.env.FIXIE_URL });
 
+// Currency Conversion
+
+let oneUSDtoEUR = () => {
+  const options = {
+    url: "https://api.exchangeratesapi.io/latest?base=USD"
+  };
+
+  return axios.request(options).then(response => {
+    let conversionRate = response.data.rates.EUR;
+    return conversionRate;
+  });
+};
+
 // Gandi _________________________________________________
 
 let get_gandi_data = userInput => {
+  console.log("gandi __________________")
   const headers = {
     authorization: "Apikey " + process.env.GANDI
   };
@@ -44,114 +58,154 @@ let get_gandi_data = userInput => {
 // nameCom _________________________________________________
 
 let get_nameCom_data = userInput => {
-  var dataString = { keyword: userInput };
+    var dataString = { domainNames: [userInput] };
 
-  var options = {
-    url: "https://api.dev.name.com/v4/domains:search",
-    method: "POST",
-    data: dataString,
-    auth: {
-      username: process.env.NAMECOMUSER,
-      password: process.env.NAMECOMPW
-    }
-  };
+    var options = {
+      url: "https://api.name.com/v4/domains:checkAvailability",
+      method: "POST",
+      data: dataString,
+      auth: {
+        username: process.env.NAMECOMUSER,
+        password: process.env.NAMECOMPW
+      }
+    };
 
-  let ctr = 0;
+    let ctr = 0;
 
-  let axiosCall = () => {
-    return axios.request(options).then(response => {
-      if (ctr < 3) {
-        // try three times, in case of faulty API response
-        ctr++;
-        if (
+    let axiosCall = () => {
+      return axios.request(options).then(response => {
+        if (ctr < 3) {
+          // try three times, in case of faulty API response
+          ctr++;
+          if (
+            Object.keys(response.data).length !== 0 && //  >>>>>>> not empty
+            response.data.results[0].domainName === userInput &&
+            response.data.results[0].purchasable === true
+          ) {
+            // console.log(response.data.results);
+            let responseObj = {
+              query: userInput,
+              name: "nameCom",
+              data: response.data,
+              price: response.data.results[0].purchasePrice,
+              available: true
+            };
+            return responseObj;
+          } else {
+            return axiosCall();
+          }
+        } else if (
+          // not availble
           Object.keys(response.data).length !== 0 && //  >>>>>>> not empty
           response.data.results[0].domainName === userInput &&
-          response.data.results[0].purchasable === true
+          !response.data.results[0].purchasable
         ) {
-          // console.log(response.data.results);
-          let responseObj = {
+          return {
             query: userInput,
-            name: "nameCom",
-            data: response.data,
-            price: response.data.results[0].purchasePrice,
-            available: true
+            name: "NameCom // not available",
+            price: 999999,
+            data: { price: "0.00", currency: "EUR" },
+            available: false
           };
-          return responseObj;
         } else {
-          return axiosCall();
+          return {
+            query: userInput,
+            name: "NameCom // Unresponsive",
+            price: 999999,
+            data: { price: "0.00", currency: "EUR" },
+            available: false
+          };
         }
-      } else if (
-        // not availble
-        Object.keys(response.data).length !== 0 && //  >>>>>>> not empty
-        response.data.results[0].domainName === userInput &&
-        !response.data.results[0].purchasable
-      ) {
-        return {
-          query: userInput,
-          name: "NameCom // not available",
-          price: 999999,
-          data: { price: "0.00", currency: "EUR" },
-          available: false
-        };
-      } else {
-        return {
-          query: userInput,
-          name: "NameCom // Unresponsive",
-          price: 999999,
-          data: { price: "0.00", currency: "EUR" },
-          available: false
-        };
-      }
-    });
-  };
-  return axiosCall();
+      });
+    };
+    return axiosCall();
+  // });
+};
+
+let get_namesilo_data = userInput => {
+    let ns = new NameSilo(process.env.NAMESILO);
+    let responseObj = {};
+
+    return ns
+      .checkRegisterAvailability([userInput])
+      .then(resp => {
+        console.log(resp);
+        if (resp.available) {
+          return (responseObj = {
+            query: userInput,
+            name: "namesilo",
+            price: resp.available.domain.price, 
+            data: resp,
+            available: true
+          });
+        } else {
+          return (responseObj = {
+            query: userInput,
+            name: "namesilo // not available",
+            data: resp,
+            price: 999999,
+            available: false
+          });
+        }
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  // });
+};
+
+module.exports = {
+  get_nameCom_data,
+  get_gandi_data,
+  get_namesilo_data,
+  oneUSDtoEUR
 };
 
 // EPIK _________________________________________________
-let get_epik_data = userInput => {
-  var headers = {
-    accept: "application/json",
-    "content-type": "application/json"
-  };
+// let get_epik_data = userInput => {
+//   var headers = {
+//     accept: "application/json",
+//     "content-type": "application/json"
+//   };
 
-  var options = {
-    url:
-      "https://usersapiv2.epik.com/v2/domains/check?SIGNATURE=" +
-      process.env.EPIK +
-      "&DOMAINS=" +
-      userInput,
-    headers: headers
-  };
+//   var options = {
+//     url:
+//       "https://usersapiv2.epik.com/v2/domains/check?SIGNATURE=" +
+//       process.env.EPIK +
+//       "&DOMAINS=" +
+//       userInput,
+//     headers: headers
+//   };
 
-  let userInputUpperCase = userInput.toUpperCase();
+//   let userInputUpperCase = userInput.toUpperCase();
 
-  return fixieRequest(options.url).then(response => {
+//   return fixieRequest(options.url).then(response => {
 
-    // console.log(response)
-    // console.log(JSON.parse(response))
-    // console.log(JSON.parse(response).data[userInputUpperCase])
-    // console.log("_______________")
+//     // console.log(response)
+//     // console.log(JSON.parse(response))
+//     // console.log(JSON.parse(response).data[userInputUpperCase])
+//     // console.log("_______________")
 
-    let responseObj = {};
-    if (JSON.parse(response).data[userInputUpperCase].available === 1) {
-      return responseObj = {
-        query: userInput,
-        name: "Epik",
-        price: JSON.parse(response).data[userInputUpperCase].price,
-        data: JSON.parse(response).data,
-        available: true
-      };
-    } else {
-      return responseObj = {
-        query: userInput,
-        name: "Epik // not available",
-        price: 99999,
-        data: JSON.parse(response).data,
-        available: false
-      };
-    }
-  });
-};
+//     let responseObj = {};
+//     if (JSON.parse(response).data[userInputUpperCase].available === 1) {
+//       return responseObj = {
+//         query: userInput,
+//         name: "Epik",
+//         price: JSON.parse(response).data[userInputUpperCase].price,
+//         data: JSON.parse(response).data,
+//         available: true
+//       };
+//     } else {
+//       return responseObj = {
+//         query: userInput,
+//         name: "Epik // not available",
+//         price: 99999,
+//         data: JSON.parse(response).data,
+//         available: false
+//       };
+//     }
+//   });
+// };
 
 // let get_epik_data = async userInput => {
 //   const EpikClient = new Epik(process.env.EPIK);
@@ -182,80 +236,41 @@ let get_epik_data = userInput => {
 
 // _________________________________________________
 
-let get_namesilo_data = userInput => {
-  let ns = new NameSilo(process.env.NAMESILO);
-  let responseObj = {};
+// let find_alt_domains = domainSTL => {
+//   //to be continued
 
-  return ns
-    .checkRegisterAvailability([userInput])
-    .then(resp => {
-      console.log(resp)
-      if (resp.available) {
-        return responseObj = {
-          query: userInput,
-          name: "namesilo",
-          price: resp.available.domain.price,
-          data: resp,
-          available: true
-        };
-      } else {
-        return responseObj = {
-          query: userInput,
-          name: "namesilo // not available",
-          data: resp,
-          price: 999999,
-          available: false
-        };
-      }
-    })
-    .catch(err => {
-      console.error(err);
-    });
-};
+//   // get nameCom overview
+//   var dataString = { keyword: domainSTL };
 
-let find_alt_domains = domainSTL => {
-  //to be continued
+//   var options = {
+//     url: "https://api.dev.name.com/v4/domains:search",
+//     method: "POST",
+//     data: dataString,
+//     auth: {
+//       username: "frederikhausburg-test",
+//       password: "d0b92716021ccb08093631646024c8f9d6b3073d"
+//     }
+//   };
 
-  // get nameCom overview
-  var dataString = { keyword: domainSTL };
+//   return axios.request(options).then(response => {
+//     responseArr = response.data.results;
+//     availArr = {};
+//     responseArr.forEach(element => {
+//       // console.log(element)
+//       // console.log("__________")
+//       // console.log(element.domainName)
+//       // console.log("__________")
+//       if (element.purchasable === true) {
+//         console.log(element.domainName);
+//         console.log("__________");
+//       }
+//       // if(element.purchasable === true){
+//       //   console.log(element)
+//       // }
+//     });
+//     // console.log(response.data.results);
+//   });
 
-  var options = {
-    url: "https://api.dev.name.com/v4/domains:search",
-    method: "POST",
-    data: dataString,
-    auth: {
-      username: "frederikhausburg-test",
-      password: "d0b92716021ccb08093631646024c8f9d6b3073d"
-    }
-  };
-
-  return axios.request(options).then(response => {
-    responseArr = response.data.results;
-    availArr = {};
-    responseArr.forEach(element => {
-      // console.log(element)
-      // console.log("__________")
-      // console.log(element.domainName)
-      // console.log("__________")
-      if (element.purchasable === true) {
-        console.log(element.domainName);
-        console.log("__________");
-      }
-      // if(element.purchasable === true){
-      //   console.log(element)
-      // }
-    });
-    // console.log(response.data.results);
-  });
-
-  // get epik altertatives with post array
-  // get gandi individual cheap domains
-};
-
-module.exports = {
-  get_nameCom_data,
-  get_gandi_data,
-  get_epik_data,
-  find_alt_domains,
-  get_namesilo_data
-};
+//   // get epik altertatives with post array
+//   // get gandi individual cheap domains
+// };

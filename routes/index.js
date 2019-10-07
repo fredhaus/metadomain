@@ -1,4 +1,5 @@
 let express = require("express");
+const expressip = require('express-ip');
 let router = express.Router();
 const User = require("../models/user");
 let allSearches = [];
@@ -7,11 +8,10 @@ let allSearches = [];
 var axios = require("axios");
 let restCountryAll = require("../misc/restCountryAPI");
 let {
-  get_epik_data,
   get_gandi_data,
   get_nameCom_data,
-  find_alt_domains, 
-  get_namesilo_data
+  get_namesilo_data,
+  oneUSDtoEUR,
 } = require("../api_calls");
 
 let line = "_____________________________"
@@ -55,17 +55,19 @@ router.get("/", function(req, res, next) {
 
 // router.get('/ipinfo', function (req, res) {
 
-//   const ipInfo = req.ipInfo;
-//   console.log("Current User is located in " + ipInfo.country, "City: " + ipInfo.city)
+  
 // var message = `Hey, you are browsing from ${ipInfo.city}, ${ipInfo.country}`;
 // res.send(message);
 // });
 
 router.get("/result", function(req, res, next) {
+
   if(!req.session.searches){
     req.session.searches = []
   }
   
+
+
   let domainName = req.query.domainSearch;
 
   //splitting searched domain by the dot
@@ -75,8 +77,8 @@ router.get("/result", function(req, res, next) {
   // IpInfo ________
   const ipInfo = req.ipInfo;
   const ipInfoCountryCode = ipInfo.country;
-  // console.log("Current User is located in " + ipInfo.country, "City: " + ipInfo.city)
-  
+
+
   // looking up domain ending for IP-Country ________________
   let ipSpecificTld = restCountryAll.find(
     ({ alpha2Code }) => alpha2Code === ipInfoCountryCode
@@ -86,14 +88,14 @@ router.get("/result", function(req, res, next) {
   countrySpecificDomain = domainStl + ipSpecificTld
   
   let resultArrAll = [
-    get_epik_data(domainName),
+    oneUSDtoEUR(),
     get_gandi_data(domainName),
     get_nameCom_data(domainName),
     get_namesilo_data(domainName),
-    get_epik_data(countrySpecificDomain),
     get_gandi_data(countrySpecificDomain),
     get_nameCom_data(countrySpecificDomain),
     get_namesilo_data(countrySpecificDomain),
+    
     
   ];
 
@@ -101,6 +103,18 @@ router.get("/result", function(req, res, next) {
     .then(results => {
       
       // console.log(JSON.stringify(results))
+      // console.log(results)
+
+      // convert NameCom & namesilo USD to EUR
+
+      results.forEach(element => {
+        if(element.name === "nameCom" || element.name == "namesilo"){
+          newPrice = (element.price * results[0]).toFixed(2) // EUR price * USDtoEUR
+          newPriceInt = parseFloat(newPrice)
+          element.price = newPriceInt
+        }
+      });
+
       console.log(results)
 
       // cheapest Query Result
