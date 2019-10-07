@@ -65,8 +65,6 @@ router.get("/result", function(req, res, next) {
   if(!req.session.searches){
     req.session.searches = []
   }
-  
-
 
   let domainName = req.query.domainSearch;
 

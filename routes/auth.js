@@ -22,6 +22,7 @@ router.get("/signup", function(req, res, next) {
   if (!req.session.searches) {
     req.session.searches = [];
   }
+
   res.render("auth/signup");
 });
 
@@ -42,7 +43,12 @@ router.post("/signup", (req, res, next) => {
     });
   }
   else if (zxcvbn(req.body.password).score < 2) {
-    res.render("auth/signup", { errorMessage: "Indicate stronger password" });
+    
+    console.log(zxcvbn(req.body.password).feedback)
+    let warning = zxcvbn(req.body.password).feedback.warning
+    let suggestion = zxcvbn(req.body.password).feedback.suggestions[0]
+
+    res.render("auth/signup", { errorMessage: "Indicate stronger password", warning: warning, suggestion: suggestion });
   }
 
 
