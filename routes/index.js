@@ -145,7 +145,7 @@ router.get("/result", function(req, res, next) {
         bestQueryResult,
         bestCountrySpecificResult,
         domainName,
-        countrySpecificDomain
+        countrySpecificDomain,
       });
 
       // Saving Search in DB/User
