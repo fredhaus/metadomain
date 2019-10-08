@@ -189,6 +189,8 @@ router.get("/result", function(req, res, next) {
         req.session.search = currentSearch; 
         req.session.searches = allSearches;
 
+        req.session.save()
+
         User.findOneAndUpdate(
           { email: "admin@istrator.com" }, // adminID - needs to be set up on database once// p4$$w0rd
           { $push: { searches: currentSearch } }
