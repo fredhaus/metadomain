@@ -22,6 +22,7 @@ router.get("/signup", function(req, res, next) {
   if (!req.session.searches) {
     req.session.searches = [];
   }
+
   res.render("auth/signup");
 });
 
@@ -35,16 +36,20 @@ router.post("/signup", (req, res, next) => {
       errorMessage: "Indicate username and password"
     });
     return;
-  } 
-  else if (!reeamil.test(email)){
+  } else if (!reeamil.test(email)) {
     res.render("auth/signup", {
       errorMessage: "Please enter valid email address"
     });
-  }
-  else if (zxcvbn(req.body.password).score < 2) {
-    res.render("auth/signup", { errorMessage: "Indicate stronger password" });
-  }
+  } else if (zxcvbn(req.body.password).score < 2) {
+    let warning = zxcvbn(req.body.password).feedback.warning;
+    let suggestion = zxcvbn(req.body.password).feedback.suggestions[0];
 
+    res.render("auth/signup", {
+      errorMessage: "Indicate stronger password",
+      warning: warning,
+      suggestion: suggestion
+    });
+  }
 
   User.findOne({ email }).then(user => {
     if (user !== null) {
@@ -59,7 +64,7 @@ router.post("/signup", (req, res, next) => {
       User.create({
         email: email,
         password: hashPass
-      }).then((user) => {
+      }).then(user => {
         req.logIn(user, function(err) {
           User.findOneAndUpdate(
             { _id: req.user._id },
@@ -100,6 +105,39 @@ router.post("/login", (req, res, next) => {
 router.get("/logout", (req, res, next) => {
   req.logOut();
   res.redirect("/");
+});
+
+// GET /user
+router.get("/user", (req, res, next) => {
+  if (req.user) {
+    searchesObj = req.user.searches;
+    // res.locals.currentUser = req.user;
+    res.render("auth/user", { searchesObj: searchesObj });
+  } else {
+    res.redirect("/login");
+  }
+});
+
+// GET /admin
+router.get("/admin", (req, res, next) => {
+  if (req.user) {
+    if (req.user.email === "admin@istrator.com") { 
+      // adminID - needs to be set up on database once// p4$$w0rd
+      searchesObj = req.user.searches;
+      res.render("auth/admin", { searchesObj: searchesObj});
+    }
+    
+    else {
+      // res.redirect("index", {errorMessage: "You are not authorized to acces this area"});
+      res.render("index", {errorMessage: "You are not authorized to acces this area", title: "Metadomain Search", user: req.user})
+    }
+
+  } else {
+    // res.redirect("/login");
+    res.render("auth/login", {
+      errorMessage: "You are not authorized to acces this area"
+    });
+  }
 });
 
 module.exports = router;
