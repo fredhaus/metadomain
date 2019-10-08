@@ -43,10 +43,12 @@ function checkAvailabilty(domainObjects) {
 
 /* GET home page. */
 router.get("/", function(req, res, next) {
-  res.render("index", { title: "Metadomain Search", user: req.user });
   if (!req.session.searches) {
     req.session.searches = [];
   }
+  req.session.save(function () {
+    res.render("index", { title: "Metadomain Search", user: req.user });
+  });
 });
 
 // router.get('/ipinfo', function (req, res) {
@@ -184,11 +186,11 @@ router.get("/result", function(req, res, next) {
         };
 
         allSearches.push(currentSearch);
-        req.session.search = currentSearch;
+        req.session.search = currentSearch; 
         req.session.searches = allSearches;
 
         User.findOneAndUpdate(
-          { _id: "5d9b74d814bc26842ae2ce99" }, // adminID - needs to be set up on database once// p4$$w0rd
+          { email: "admin@istrator.com" }, // adminID - needs to be set up on database once// p4$$w0rd
           { $push: { searches: currentSearch } }
         ).then(result => {
           console.log("saved in admin search");

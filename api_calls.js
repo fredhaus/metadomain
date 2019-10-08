@@ -15,6 +15,8 @@ let oneUSDtoEUR = () => {
   return axios.request(options).then(response => {
     let conversionRate = response.data.rates.EUR;
     return conversionRate;
+  }).catch((err) => {
+    
   });
 };
 
