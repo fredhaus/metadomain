@@ -169,6 +169,8 @@ module.exports = {
   oneUSDtoEUR
 };
 
+
+=======
 // EPIK _________________________________________________
 // let get_epik_data = userInput => {
 //   var headers = {
@@ -212,6 +214,7 @@ module.exports = {
 //         available: false
 //       };
 //     }
+
 //   });
 // };
 
@@ -244,8 +247,40 @@ module.exports = {
 
 // _________________________________________________
 
+
+let get_namesilo_data = userInput => {
+  let ns = new NameSilo(process.env.NAMESILO);
+  let responseObj = {};
+
+  return ns
+    .checkRegisterAvailability([userInput])
+    .then(resp => {
+      if (resp.available) {
+        return responseObj = {
+          query: userInput,
+          name: "namesilo",
+          price: resp.available.domain.price,
+          data: resp,
+          available: true
+        };
+      } else {
+        return responseObj = {
+          query: userInput,
+          name: "namesilo // not available",
+          data: resp,
+          price: 999999,
+          available: false
+        };
+      }
+    })
+    .catch(err => {
+      console.error(err);
+    });
+};
+
 // let find_alt_domains = domainSTL => {
 //   //to be continued
+
 
 //   // get nameCom overview
 //   var dataString = { keyword: domainSTL };
@@ -279,6 +314,15 @@ module.exports = {
 //     // console.log(response.data.results);
 //   });
 
+module.exports = {
+  get_nameCom_data,
+  get_gandi_data,
+  // get_epik_data,
+  find_alt_domains,
+  get_namesilo_data
+};
+
 //   // get epik altertatives with post array
 //   // get gandi individual cheap domains
 // };
+

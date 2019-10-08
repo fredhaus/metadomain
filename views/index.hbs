@@ -5,6 +5,8 @@
 {{/if}}
 <h2>Welcome {{#if user}} {{user.email}} {{else}} Stranger {{/if}} !</h2>
 
+
+
 {{#if user}}
 <a href="/logout">Log out</a><br>
 
@@ -14,6 +16,11 @@
 <br>
 <a href="/signup">Sign up</a>
 {{/if}}
+
+{{#if errorMessage}}
+<div class="error-message">{{ errorMessage }}</div>
+{{/if}}
+
 <form action="/result">
     <div class="form-group">
         <div class="search">

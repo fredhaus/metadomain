@@ -59,145 +59,155 @@ router.get("/result", function(req, res, next) {
   if (!req.session.searches) {
     req.session.searches = [];
   }
-
   let domainName = req.query.domainSearch;
 
-  //splitting searched domain by the dot
-  let domainNameArr = domainName.split(".");
-  let domainStl = domainNameArr[0];
+  // domain input verification >> string.string
 
-  // IpInfo ________
-  const ipInfo = req.ipInfo;
-  const ipInfoCountryCode = ipInfo.country;
+  if (domainName.match(/^[a-zA-Z0-9-]+\.[a-zA-Z0-9]+$/) === null) {
+    let errorMessage =
+      '"' +
+      domainName +
+      '" is not a valid search term. Please try again in the format of domain.ending';
+    res.render("index", { domainName, errorMessage });
+  } else {
+    let domainName = req.query.domainSearch;
 
-  // looking up domain ending for IP-Country ________________
-  let ipSpecificTld = restCountryAll.find(
-    ({ alpha2Code }) => alpha2Code === ipInfoCountryCode
-  ).topLevelDomain[0];
+    //splitting searched domain by the dot
+    let domainNameArr = domainName.split(".");
+    let domainStl = domainNameArr[0];
 
-  // assembling country/ip-specific new domain
-  countrySpecificDomain = domainStl + ipSpecificTld;
+    // IpInfo ________
+    const ipInfo = req.ipInfo;
+    const ipInfoCountryCode = ipInfo.country;
+    // console.log("Current User is located in " + ipInfo.country, "City: " + ipInfo.city)
 
-  let resultArrAll = [
-    oneUSDtoEUR(),
-    get_gandi_data(domainName),
-    get_nameCom_data(domainName),
-    get_namesilo_data(domainName),
-    get_gandi_data(countrySpecificDomain),
-    get_nameCom_data(countrySpecificDomain),
-    get_namesilo_data(countrySpecificDomain)
-  ];
+    // looking up domain ending for IP-Country ________________
+    let ipSpecificTld = restCountryAll.find(
+      ({ alpha2Code }) => alpha2Code === ipInfoCountryCode
+    ).topLevelDomain[0];
 
-  Promise.all(resultArrAll)
-    .then(results => {
-      console.log(results)
+    // assembling country/ip-specific new domain
+    countrySpecificDomain = domainStl + ipSpecificTld;
 
-      // convert NameCom & namesilo USD to EUR
+    let resultArrAll = [
+      oneUSDtoEUR(),
+      get_gandi_data(domainName),
+      get_nameCom_data(domainName),
+      get_namesilo_data(domainName),
+      get_gandi_data(countrySpecificDomain),
+      get_nameCom_data(countrySpecificDomain),
+      get_namesilo_data(countrySpecificDomain)
+    ];
 
-      results.forEach(element => {
-        if (element.name === "nameCom" || element.name == "namesilo") {
-          newPrice = (element.price * results[0]).toFixed(2); // EUR price * USDtoEUR
-          newPriceInt = parseFloat(newPrice);
-          element.price = newPriceInt;
+    Promise.all(resultArrAll)
+      .then(results => {
+        // console.log(JSON.stringify(results))
+        console.log(results);
+
+        results.forEach(element => {
+          if (element.name === "nameCom" || element.name == "namesilo") {
+            newPrice = (element.price * results[0]).toFixed(2); // EUR price * USDtoEUR
+            newPriceInt = parseFloat(newPrice);
+            element.price = newPriceInt;
+          }
+        });
+
+        // cheapest Query Result
+        let QueryResult = results.filter(function(obj) {
+          return obj.query === domainName;
+        });
+        // cheapest countrySpecific Result
+        let countrySpecificResult = results.filter(function(obj) {
+          return obj.query === countrySpecificDomain;
+        });
+
+        //Checking availability
+        let avaialbleQueryResults = checkAvailabilty(QueryResult);
+        let avaialblecountrySpecificResult = checkAvailabilty(
+          countrySpecificResult
+        );
+
+        // Handling case of unavailability // query
+        bestQueryResult = {};
+        if (avaialbleQueryResults.length > 0) {
+          // Finding cheapest option of potential alternatives
+          bestQueryResult = findCheapest(avaialbleQueryResults);
+        } else {
+          (bestQueryResult.name = "Unavailable"),
+            (bestQueryResult.price = "0.00");
         }
-      });
+        bestCountrySpecificResult = {};
+        // Handling case of unavailability // country specific
+        if (avaialblecountrySpecificResult.length > 0) {
+          // Finding cheapest option of potential alternatives
+          bestCountrySpecificResult = findCheapest(
+            avaialblecountrySpecificResult
+          );
+        } else {
+          (bestCountrySpecificResult.name = "Unavailable"),
+            (bestCountrySpecificResult.price = "0.00");
+        }
 
-      // console.log(results)
+        // rendering result page
+        res.render("result", {
+          bestQueryResult,
+          bestCountrySpecificResult,
+          domainName,
+          countrySpecificDomain
+        });
 
-      // cheapest Query Result
-      let QueryResult = results.filter(function(obj) {
-        return obj.query === domainName;
-      });
-      // cheapest countrySpecific Result
-      let countrySpecificResult = results.filter(function(obj) {
-        return obj.query === countrySpecificDomain;
-      });
+        // Saving Search in DB/User
 
-      //Checking availability
-      let avaialbleQueryResults = checkAvailabilty(QueryResult);
-      let avaialblecountrySpecificResult = checkAvailabilty(
-        countrySpecificResult
-      );
+        let today = new Date();
+        let date =
+          today.getFullYear() +
+          "-" +
+          (today.getMonth() + 1) +
+          "-" +
+          today.getDate();
+        let time =
+          today.getHours() +
+          ":" +
+          today.getMinutes() +
+          ":" +
+          today.getSeconds();
+        let timestamp = Date.now();
 
-      // Handling case of unavailability // query
-      bestQueryResult = {};
-      if (avaialbleQueryResults.length > 0) {
-        // Finding cheapest option of potential alternatives
-        bestQueryResult = findCheapest(avaialbleQueryResults);
-      } else {
-        (bestQueryResult.name = "Unavailable"),
-          (bestQueryResult.price = "0.00");
-      }
-      bestCountrySpecificResult = {};
-      // Handling case of unavailability // country specific
-      if (avaialblecountrySpecificResult.length > 0) {
-        // Finding cheapest option of potential alternatives
-        bestCountrySpecificResult = findCheapest(
-          avaialblecountrySpecificResult
-        );
-      } else {
-        (bestCountrySpecificResult.name = "Unavailable"),
-          (bestCountrySpecificResult.price = "0.00");
-      }
+        let currentSearch = {
+          domain: domainName,
+          price: bestQueryResult.price,
+          host: bestQueryResult.name,
+          available: bestQueryResult.available,
+          timestamp: timestamp,
+          SearchDate: date,
+          SearchTime: time
+        };
 
-      // rendering result page
-      res.render("result", {
-        bestQueryResult,
-        bestCountrySpecificResult,
-        domainName,
-        countrySpecificDomain,
-      });
+        allSearches.push(currentSearch);
+        req.session.search = currentSearch;
+        req.session.searches = allSearches;
 
-      // Saving Search in DB/User
-
-      let today = new Date();
-      let date =
-        today.getFullYear() +
-        "-" +
-        (today.getMonth() + 1) +
-        "-" +
-        today.getDate();
-      let time =
-        today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-      let timestamp = Date.now();
-
-      let currentSearch = {
-        domain: domainName,
-        price: bestQueryResult.price,
-        host: bestQueryResult.name,
-        available: bestQueryResult.available,
-        timestamp: timestamp,
-        SearchDate: date,
-        SearchTime: time
-      };
-
-      // console.log(currentSearch)
-      allSearches.push(currentSearch);
-      req.session.search = currentSearch;
-      req.session.searches = allSearches;
-
-      console.log(currentSearch);
-
-      User.findOneAndUpdate(
-        { _id: "5d9b74d814bc26842ae2ce99" }, // adminID - needs to be set up on database once// p4$$w0rd
-        { $push: { searches: currentSearch } }
-      ).then(result => {
-        console.log("saved in admin search");
-      });
-
-      if (req.user) {
-        return User.findOneAndUpdate(
-          { _id: req.user._id },
+        User.findOneAndUpdate(
+          { _id: "5d9b74d814bc26842ae2ce99" }, // adminID - needs to be set up on database once// p4$$w0rd
           { $push: { searches: currentSearch } }
-        );
-      }
-    })
-    .then(result => {
-      console.log("Saved successfully");
-    })
-    .catch(error => {
-      console.log(error);
-    });
+        ).then(result => {
+          console.log("saved in admin search");
+        });
+
+        if (req.user) {
+          return User.findOneAndUpdate(
+            { _id: req.user._id },
+            { $push: { searches: currentSearch } }
+          );
+        }
+      })
+      .then(result => {
+        console.log("Saved successfully");
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
 });
 
 module.exports = router;
