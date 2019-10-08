@@ -22,7 +22,7 @@
             <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
             <div class="price">
                 <p>{{bestQueryResult.price}} €</p>
-                <a href="#" class="btn btn-primary">Check offer!</a>
+                <a href={{bestQueryResult.redirectURL}} class="btn btn-primary">Check offer!</a>
             </div>
         </div>
     </div>
@@ -35,7 +35,7 @@
             <p class="card-text">Domain Dealer: {{bestCountrySpecificResult.name}}</p>
             <div class="price">
                 <p>{{bestCountrySpecificResult.price}} €</p>
-                <a href="#" class="btn btn-primary">Check offer!</a>
+                <a href={{bestCountrySpecificResult.redirectURL}} class="btn btn-primary">Check offer!</a>
             </div>
         </div>
     </div>

@@ -40,7 +40,8 @@ let get_gandi_data = userInput => {
         name: "gandi",
         data: response.data,
         price: response.data.products[0].prices[0].price_after_taxes,
-        available: true
+        available: true,
+        redirectURL: "https://shop.gandi.net/en/domain/suggest?search=" + userInput
       };
     } else {
       responseObj = {
@@ -88,7 +89,9 @@ let get_nameCom_data = userInput => {
               name: "nameCom",
               data: response.data,
               price: response.data.results[0].purchasePrice,
-              available: true
+              available: true,
+              redirectURL: "https://www.name.com/domain/search/" + userInput
+
             };
             return responseObj;
           } else {
@@ -137,7 +140,8 @@ let get_namesilo_data = userInput => {
             name: "namesilo",
             price: parseFloat(resp.available.domain.price),//resp.available.domain.price, 
             data: resp,
-            available: true
+            available: true,
+            redirectURL: "https://www.namesilo.com/register.php?rid=65d8839p"
           });
         } else {
           return (responseObj = {
