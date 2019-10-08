@@ -49,33 +49,33 @@ router.post("/signup", (req, res, next) => {
       warning: warning,
       suggestion: suggestion
     });
-  }
+  } else {
+    User.findOne({ email }).then(user => {
+      if (user !== null) {
+        res.render("auth/signup", {
+          errorMessage: "The username already exists"
+        });
+        return;
+      } else {
+        const salt = bcrypt.genSaltSync(bcryptSalt);
+        const hashPass = bcrypt.hashSync(password, salt);
 
-  User.findOne({ email }).then(user => {
-    if (user !== null) {
-      res.render("auth/signup", {
-        errorMessage: "The username already exists"
-      });
-      return;
-    } else {
-      const salt = bcrypt.genSaltSync(bcryptSalt);
-      const hashPass = bcrypt.hashSync(password, salt);
-
-      User.create({
-        email: email,
-        password: hashPass
-      }).then(user => {
-        req.logIn(user, function(err) {
-          User.findOneAndUpdate(
-            { _id: req.user._id },
-            { $push: { searches: req.session.searches } }
-          ).then(() => {
-            res.redirect("/");
+        User.create({
+          email: email,
+          password: hashPass
+        }).then(user => {
+          req.logIn(user, function(err) {
+            User.findOneAndUpdate(
+              { _id: req.user._id },
+              { $push: { searches: req.session.searches } }
+            ).then(() => {
+              res.redirect("/");
+            });
           });
         });
-      });
-    }
-  });
+      }
+    });
+  }
 });
 
 // POST /login
@@ -121,17 +121,18 @@ router.get("/user", (req, res, next) => {
 // GET /admin
 router.get("/admin", (req, res, next) => {
   if (req.user) {
-    if (req.user.email === "admin@istrator.com") { 
+    if (req.user.email === "admin@istrator.com") {
       // adminID - needs to be set up on database once// p4$$w0rd
       searchesObj = req.user.searches;
-      res.render("auth/admin", { searchesObj: searchesObj});
-    }
-    
-    else {
+      res.render("auth/admin", { searchesObj: searchesObj });
+    } else {
       // res.redirect("index", {errorMessage: "You are not authorized to acces this area"});
-      res.render("index", {errorMessage: "You are not authorized to acces this area", title: "Metadomain Search", user: req.user})
+      res.render("index", {
+        errorMessage: "You are not authorized to acces this area",
+        title: "Metadomain Search",
+        user: req.user
+      });
     }
-
   } else {
     // res.redirect("/login");
     res.render("auth/login", {
