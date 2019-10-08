@@ -33,7 +33,10 @@
             </div>
         </div>
     </div>
-    <button type="submit">New Search</button>
+    <button onclick="test()" type="submit">New Search</button>
     <script>
+        function test() {
+            document.getElementsByTagName('form')[0].style.display = 'none';
+        }
     </script>
 </form>

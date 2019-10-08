@@ -3,6 +3,7 @@ const expressip = require("express-ip");
 let router = express.Router();
 const User = require("../models/user");
 let allSearches = [];
+const _ = require("lodash");
 
 var axios = require("axios");
 let restCountryAll = require("../misc/restCountryAPI");
@@ -14,6 +15,8 @@ let {
 } = require("../api_calls");
 
 let line = "_____________________________";
+
+let trends = [".top", ".xyz", ".icu", ".site", ".online"];
 
 // Function gets array of objects as input (available suppliers) and compares their prices.
 // Then returns object of the cheapest supplier.
@@ -47,6 +50,27 @@ router.get("/", function(req, res, next) {
   if (!req.session.searches) {
     req.session.searches = [];
   }
+});
+
+router.get("/trends", function(req, res, next) {
+  let coreTrendName = req.query.domain;
+  let domainNameArrTrend = coreTrendName.split(".");
+  let domainStlTrend = domainNameArrTrend[0];
+  let trendResultsAll = [];
+  trends.forEach(trend => {
+    trendResultsAll.push(get_gandi_data(domainStlTrend + trend));
+    trendResultsAll.push(get_nameCom_data(domainStlTrend + trend));
+    trendResultsAll.push(get_namesilo_data(domainStlTrend + trend));
+  });
+  Promise.all(trendResultsAll)
+    .then(results => {
+      let sorted = _.sortBy(results, ["price"]);
+      console.log(sorted);
+      res.render("trends", { user: req.user, sorted, layout: false });
+    })
+    .catch(err => {
+      console.log(err);
+    });
 });
 
 // router.get('/ipinfo', function (req, res) {
