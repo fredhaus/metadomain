@@ -1,10 +1,16 @@
 <h1>{{title}}</h1>
-<h1>Welcome {{#if user}} {{user.email}} {{else}} Stranger {{/if}} !</h1>
+
+{{#if errorMessage}}
+<div class="error-message">{{ errorMessage }}</div>
+{{/if}}
+<h2>Welcome {{#if user}} {{user.email}} {{else}} Stranger {{/if}} !</h2>
 
 
 
 {{#if user}}
-<a href="/logout">Log out</a>
+<a href="/logout">Log out</a><br>
+
+<a href="/user">My searches</a>
 {{else}}
 <a href="/login">Log in</a>
 <br>

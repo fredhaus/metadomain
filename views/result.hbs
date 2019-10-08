@@ -8,7 +8,7 @@
                 <input type="text" class="form-control" name="domainSearch" placeholder="{{domainName}}"
                     aria-label="domainSearchQuery" aria-describedby="basic-addon1">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">.com</span>
+                    {{!-- <span class="input-group-text" id="basic-addon1">.com</span> --}}
                 </div>
             </div>
         </div>
@@ -17,26 +17,41 @@
 </form>
 <div class="results">
     <div class="card">
-        <h5 class="card-header">{{bestQueryResult.name}}</h5>
+        {{#if bestQueryResult.availableHB}}
+        <h5 class="card-header">{{domainName}} is available</h5>
+        {{else}}
+        <h5 class="card-header">{{domainName}} is currently not available.</h5>
+        {{/if}}
         <div class="card-body">
-            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+            {{#if bestQueryResult.availableHB}}
+            <p class="card-text">Domain Dealer: {{bestQueryResult.name}}</p>
             <div class="price">
-                <p>{{bestQueryResult.price}}</p>
-                <a href="#" class="btn btn-primary">Check offer!</a>
+                <p>{{bestQueryResult.price}} €</p>
+                <a href={{bestQueryResult.redirectURL}} class="btn btn-primary">Check offer!</a>
             </div>
+            {{/if}}
         </div>
     </div>
 </div>
 
 <div class="countryDomain">
     <div class="card">
-        <h5 class="card-header"> Your current country domainName: {{countrySpecificDomain}}</h5>
+
+        {{#if bestCountrySpecificResult.availableHB}}
+        <h5 class="card-header">Your current country domainName: {{countrySpecificDomain}} is available</h5>
+        {{else}}
+        <h5 class="card-header">Your current country domainName: {{countrySpecificDomain}} is currently not available.
+        </h5>
+        {{/if}}
+
         <div class="card-body">
+            {{#if bestCountrySpecificResult.availableHB}}
             <p class="card-text">Domain Dealer: {{bestCountrySpecificResult.name}}</p>
             <div class="price">
-                <p>{{bestCountrySpecificResult.price}}</p>
-                <a href="#" class="btn btn-primary">Check offer!</a>
+                <p>{{bestCountrySpecificResult.price}} €</p>
+                <a href={{bestCountrySpecificResult.redirectURL}} class="btn btn-primary">Check offer!</a>
             </div>
+            {{/if}}
         </div>
     </div>
 </div>

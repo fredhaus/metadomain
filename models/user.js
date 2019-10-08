@@ -11,7 +11,12 @@ const userSchema = new Schema(
     searches: [
       {
         domain: String,
-        price: Number
+        price: Number,
+        host: String,
+        available: Boolean,
+        timestamp: Number,
+        SearchDate: String,
+        SearchTime: String
       }
     ]
   },

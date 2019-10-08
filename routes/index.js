@@ -1,4 +1,5 @@
 let express = require("express");
+const expressip = require("express-ip");
 let router = express.Router();
 const User = require("../models/user");
 let allSearches = [];
@@ -6,11 +7,10 @@ let allSearches = [];
 var axios = require("axios");
 let restCountryAll = require("../misc/restCountryAPI");
 let {
-  // get_epik_data,
   get_gandi_data,
   get_nameCom_data,
-  find_alt_domains,
-  get_namesilo_data
+  get_namesilo_data,
+  oneUSDtoEUR
 } = require("../api_calls");
 
 let line = "_____________________________";
@@ -51,8 +51,6 @@ router.get("/", function(req, res, next) {
 
 // router.get('/ipinfo', function (req, res) {
 
-//   const ipInfo = req.ipInfo;
-//   console.log("Current User is located in " + ipInfo.country, "City: " + ipInfo.city)
 // var message = `Hey, you are browsing from ${ipInfo.city}, ${ipInfo.country}`;
 // res.send(message);
 // });
@@ -66,7 +64,10 @@ router.get("/result", function(req, res, next) {
   // domain input verification >> string.string
 
   if (domainName.match(/^[a-zA-Z0-9-]+\.[a-zA-Z0-9]+$/) === null) {
-    let errorMessage = '"' + domainName + '" is not a valid search term. Please try again in the format of domain.ending'
+    let errorMessage =
+      '"' +
+      domainName +
+      '" is not a valid search term. Please try again in the format of domain.ending';
     res.render("index", { domainName, errorMessage });
   } else {
     let domainName = req.query.domainSearch;
@@ -89,11 +90,10 @@ router.get("/result", function(req, res, next) {
     countrySpecificDomain = domainStl + ipSpecificTld;
 
     let resultArrAll = [
-      // get_epik_data(domainName),
+      oneUSDtoEUR(),
       get_gandi_data(domainName),
       get_nameCom_data(domainName),
       get_namesilo_data(domainName),
-      // get_epik_data(countrySpecificDomain),
       get_gandi_data(countrySpecificDomain),
       get_nameCom_data(countrySpecificDomain),
       get_namesilo_data(countrySpecificDomain)
@@ -103,6 +103,14 @@ router.get("/result", function(req, res, next) {
       .then(results => {
         // console.log(JSON.stringify(results))
         console.log(results);
+
+        results.forEach(element => {
+          if (element.name === "nameCom" || element.name == "namesilo") {
+            newPrice = (element.price * results[0]).toFixed(2); // EUR price * USDtoEUR
+            newPriceInt = parseFloat(newPrice);
+            element.price = newPriceInt;
+          }
+        });
 
         // cheapest Query Result
         let QueryResult = results.filter(function(obj) {
@@ -149,18 +157,49 @@ router.get("/result", function(req, res, next) {
         });
 
         // Saving Search in DB/User
+
+        let today = new Date();
+        let date =
+          today.getFullYear() +
+          "-" +
+          (today.getMonth() + 1) +
+          "-" +
+          today.getDate();
+        let time =
+          today.getHours() +
+          ":" +
+          today.getMinutes() +
+          ":" +
+          today.getSeconds();
+        let timestamp = Date.now();
+
         let currentSearch = {
           domain: domainName,
-          price: bestQueryResult.price
+          price: bestQueryResult.price,
+          host: bestQueryResult.name,
+          available: bestQueryResult.available,
+          timestamp: timestamp,
+          SearchDate: date,
+          SearchTime: time
         };
+
         allSearches.push(currentSearch);
         req.session.search = currentSearch;
         req.session.searches = allSearches;
 
-        return User.findOneAndUpdate(
-          { _id: req.user._id },
+        User.findOneAndUpdate(
+          { _id: "5d9b74d814bc26842ae2ce99" }, // adminID - needs to be set up on database once// p4$$w0rd
           { $push: { searches: currentSearch } }
-        );
+        ).then(result => {
+          console.log("saved in admin search");
+        });
+
+        if (req.user) {
+          return User.findOneAndUpdate(
+            { _id: req.user._id },
+            { $push: { searches: currentSearch } }
+          );
+        }
       })
       .then(result => {
         console.log("Saved successfully");
