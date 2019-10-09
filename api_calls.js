@@ -37,8 +37,11 @@ let get_gandi_data = userInput => {
     let responseObj = {};
 
     if (response.data.products[0].status === "available") {
+
+      let endingArr = userInput.split(".")
       responseObj = {
         query: userInput,
+        ending: "." + endingArr[1],
         name: "gandi",
         data: response.data,
         price: response.data.products[0].prices[0].price_after_taxes,
@@ -77,7 +80,8 @@ let get_nameCom_data = userInput => {
     let ctr = 0;
 
     let axiosCall = () => {
-      return axios.request(options).then(response => {
+      return axios.request(options)
+      .then(response => {
         if (ctr < 3) {
           // try three times, in case of faulty API response
           ctr++;
@@ -86,9 +90,10 @@ let get_nameCom_data = userInput => {
             response.data.results[0].domainName === userInput &&
             response.data.results[0].purchasable === true
           ) {
-            // console.log(response.data.results);
+            let endingArr = userInput.split(".")
             let responseObj = {
               query: userInput,
+              ending: "." + endingArr[1],
               name: "nameCom",
               data: response.data,
               price: response.data.results[0].purchasePrice,
@@ -138,9 +143,10 @@ let get_namesilo_data = userInput => {
       .then(resp => {
         
         if (resp.available) {
-          // console.log(parseFloat(resp.available.domain.price));
+          let endingArr = userInput.split(".")
           return (responseObj = {
             query: userInput,
+            ending: "." + endingArr[1],
             name: "namesilo",
             price: parseFloat(resp.available.domain.price),//resp.available.domain.price, 
             data: resp,
@@ -159,7 +165,9 @@ let get_namesilo_data = userInput => {
         }
       })
       .catch(err => {
-        console.error(err);
+        
+        // console.error(err);
+        console.log("# __________________ Namesilo not availalbe/responsive")
       });
   // });
 };

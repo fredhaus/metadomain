@@ -16,7 +16,7 @@ let {
 
 let line = "_____________________________";
 
-let trends = [".top", ".xyz", ".icu", ".site", ".online"];
+let trends = [".top", ".xyz", ".io", ".site", ".online"];
 
 // Function gets array of objects as input (available suppliers) and compares their prices.
 // Then returns object of the cheapest supplier.
@@ -49,7 +49,7 @@ router.get("/", function(req, res, next) {
   if (!req.session.searches) {
     req.session.searches = [];
   }
-  req.session.save(function () {
+  req.session.save(function() {
     res.render("index", { title: "Metadomain Search", user: req.user });
   });
 });
@@ -66,8 +66,25 @@ router.get("/trends", function(req, res, next) {
   });
   Promise.all(trendResultsAll)
     .then(results => {
-      let sorted = _.sortBy(results, ["price"]);
-      console.log(sorted);
+      let sorted = [];
+
+      for (let index = 0; index < trends.length; index++) {
+        const trendsEnding = trends[index];
+
+        let tempResults = [];
+        results.forEach(element => {
+          if (element.ending === trendsEnding) {
+            // own temp array for each ending
+            tempResults.push(element);
+          }
+        });
+        let tempSorted = _.sortBy(tempResults, ["price"]);
+        sorted.push(tempSorted[0]);
+      }
+
+      sorted = _.sortBy(sorted, ["price"]);
+      
+
       res.render("trends", { user: req.user, sorted, layout: false });
     })
     .catch(err => {
@@ -210,10 +227,10 @@ router.get("/result", function(req, res, next) {
         };
 
         allSearches.push(currentSearch);
-        req.session.search = currentSearch; 
+        req.session.search = currentSearch;
         req.session.searches = allSearches;
 
-        req.session.save()
+        req.session.save();
 
         User.findOneAndUpdate(
           { email: "admin@istrator.com" }, // adminID - needs to be set up on database once// p4$$w0rd
