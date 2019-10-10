@@ -1,7 +1,10 @@
 <ul>
     {{#each sorted}}
     <li>Searchterm: <strong>{{this.query}}</strong></li>
-    <li>Price: {{this.price}}</li>
-    ______________________________________________________________
+    <li>Price: {{this.price}} €</li>
+    <li>Host: {{this.name}}</li>
+    <a href={{this.redirectURL}} class="btn btn-primary" target="_blank">Check offer!</a>
+    <br>
+    <br>
     {{/each}}
 </ul>

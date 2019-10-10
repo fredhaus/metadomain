@@ -124,6 +124,33 @@ router.get("/admin", (req, res, next) => {
     if (req.user.email === "admin@istrator.com") {
       // adminID - needs to be set up on database once// p4$$w0rd
       searchesObj = req.user.searches;
+      allEndings = [];
+      endingStats = {};
+      for (let index = 0; index < searchesObj.length; index++) {
+        const element = searchesObj[index];
+        // console.log(element.ending)
+        if (
+          !allEndings.includes(element.ending) &&
+          typeof element.ending !== "undefined"
+        ) {
+          allEndings.push(element.ending);
+        }
+      }
+      console.log(allEndings);
+
+      for (let index = 0; index < allEndings.length; index++) {
+        const element = allEndings[index];
+        endingStats[element] = 0;
+        for (let index = 0; index < searchesObj.length; index++) {
+          const element2 = searchesObj[index];
+          if (element2.ending == element) {
+            endingStats[element.ending]++;
+          }
+        }
+      }
+
+      console.log(endingStats)
+
       res.render("auth/admin", { searchesObj: searchesObj });
     } else {
       // res.redirect("index", {errorMessage: "You are not authorized to acces this area"});
