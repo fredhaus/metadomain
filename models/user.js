@@ -11,6 +11,8 @@ const userSchema = new Schema(
     searches: [
       {
         domain: String,
+        ending: String,
+        redirectURL: String,
         price: Number,
         host: String,
         available: Boolean,

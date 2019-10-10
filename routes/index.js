@@ -59,6 +59,7 @@ router.get("/trends", function(req, res, next) {
   let domainNameArrTrend = coreTrendName.split(".");
   let domainStlTrend = domainNameArrTrend[0];
   let trendResultsAll = [];
+  oneUSDtoEUR();
   trends.forEach(trend => {
     trendResultsAll.push(get_gandi_data(domainStlTrend + trend));
     trendResultsAll.push(get_nameCom_data(domainStlTrend + trend));
@@ -66,26 +67,36 @@ router.get("/trends", function(req, res, next) {
   });
   Promise.all(trendResultsAll)
     .then(results => {
-      let sorted = [];
-
-      for (let index = 0; index < trends.length; index++) {
-        const trendsEnding = trends[index];
-
-        let tempResults = [];
+      // console.log(results)
+      oneUSDtoEUR().then(rate => {
         results.forEach(element => {
-          if (element.ending === trendsEnding) {
-            // own temp array for each ending
-            tempResults.push(element);
+          if (element.name === "nameCom" || element.name == "namesilo") {
+            newPrice = (element.price * rate).toFixed(2); // EUR price * USDtoEUR
+            newPriceInt = parseFloat(newPrice);
+            element.price = newPriceInt;
           }
         });
-        let tempSorted = _.sortBy(tempResults, ["price"]);
-        sorted.push(tempSorted[0]);
-      }
 
-      sorted = _.sortBy(sorted, ["price"]);
-      
+        let sorted = [];
 
-      res.render("trends", { user: req.user, sorted, layout: false });
+        for (let index = 0; index < trends.length; index++) {
+          const trendsEnding = trends[index];
+
+          let tempResults = [];
+          results.forEach(element => {
+            if (element.ending === trendsEnding) {
+              // own temp array for each ending
+              tempResults.push(element);
+            }
+          });
+          let tempSorted = _.sortBy(tempResults, ["price"]);
+          sorted.push(tempSorted[0]);
+        }
+
+        sorted = _.sortBy(sorted, ["price"]);
+
+        res.render("trends", { user: req.user, sorted, layout: false });
+      });
     })
     .catch(err => {
       console.log(err);
@@ -218,6 +229,8 @@ router.get("/result", function(req, res, next) {
 
         let currentSearch = {
           domain: domainName,
+          ending: bestQueryResult.ending,
+          redirectURL: bestQueryResult.redirectURL,
           price: bestQueryResult.price,
           host: bestQueryResult.name,
           available: bestQueryResult.available,
@@ -225,6 +238,7 @@ router.get("/result", function(req, res, next) {
           SearchDate: date,
           SearchTime: time
         };
+
 
         allSearches.push(currentSearch);
         req.session.search = currentSearch;
