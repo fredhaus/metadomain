@@ -240,9 +240,8 @@ router.get("/result", function(req, res, next) {
         };
 
 
-        allSearches.push(currentSearch);
         req.session.search = currentSearch;
-        req.session.searches = allSearches;
+        req.session.searches.push(currentSearch)
 
         req.session.save();
 
