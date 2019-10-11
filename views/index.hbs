@@ -1,42 +1,72 @@
-<h1>{{title}}</h1>
-
 {{#if errorMessage}}
 <div class="error-message">{{ errorMessage }}</div>
-{{/if}}
-<h2>Welcome {{#if user}} {{user.email}} {{else}} Stranger {{/if}} !</h2>
-
-
-
-{{#if user}}
-<a href="/logout">Log out</a><br>
-
-<a href="/user">My searches</a>
-{{else}}
-<a href="/login">Log in</a>
-<br>
-<a href="/signup">Sign up</a>
 {{/if}}
 
 {{#if errorMessage}}
 <div class="error-message">{{ errorMessage }}</div>
 {{/if}}
+<div class="landing">
+    {{#if user}}
+    <div class="headerMain">
+        <h1>Welcome back to Metadomain! Find your next best offer!</h1>
+    </div>
+    <div class="headerSub">
+        <h5>Metadomain is a free service that checks all potential domain sellers and shows you the cheapest offer
+            available</h5>
+    </div>
+    {{else}}
+    <div class="headerMain">
+        <h1>Want to buy a domain? Type in your preferred name and find the cheapest offering!</h1>
+    </div>
+    <div class="headerSub">
+        <h5>Metadomain is a free service that checks all potential domain sellers and shows you the cheapest offer
+            available</h5>
+    </div>
+    {{/if}}
 
-<form action="/result">
-    <div class="form-group">
-        <div class="search">
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">www.</span>
+    <form class="userSearchInput" action="/result">
+        <div class="form-group">
+            <div class="search">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">www.</span>
+                    </div>
+                    <input type="text" class="form-control" name="domainSearch" placeholder="example.com"
+                        aria-label="domainSearchQuery" aria-describedby="basic-addon1">
                 </div>
-                <input type="text" class="form-control" name="domainSearch" placeholder="example.com"
-                    aria-label="domainSearchQuery" aria-describedby="basic-addon1">
+            </div>
+        </div>
+        <button class="" onclick="test()" type="submit">Find cheapest</button>
+    </form>
+</div>
+<div class="spinner">
+    <div class="lds-css ng-scope" style="display: none">
+        <div style="width:100%;height:100%" class="lds-double-ring">
+            <div></div>
+            <div></div>
+            <div>
+                <div></div>
+            </div>
+            <div>
+                <div></div>
             </div>
         </div>
     </div>
-    <button onclick="test()" type="submit">New Search</button>
-    <script>
-        function test() {
-            document.getElementsByTagName('form')[0].style.display = 'none';
-        }
-    </script>
-</form>
+</div>
+<div class="suppliers">
+    <div class="logo">
+        <img src="/img/Gandi.png">
+    </div>
+    <div class="logo">
+        <img src="/img/namesilo.png">
+    </div>
+    <div class="logo">
+        <img src="/img/namecom.png">
+    </div>
+</div>
+<script>
+    function test() {
+        document.getElementsByClassName('userSearchInput')[0].style.display = 'none';
+        document.getElementsByClassName('lds-css')[0].style.display = 'block';
+    }
+</script>

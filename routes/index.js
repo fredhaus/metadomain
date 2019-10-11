@@ -50,7 +50,7 @@ router.get("/", function(req, res, next) {
     req.session.searches = [];
   }
   req.session.save(function() {
-    res.render("index", { title: "Metadomain Search", user: req.user });
+    res.render("index", { user: req.user });
   });
 });
 
@@ -204,10 +204,11 @@ router.get("/result", function(req, res, next) {
 
         // rendering result page
         res.render("result", {
-          bestQueryResult,
-          bestCountrySpecificResult,
-          domainName,
-          countrySpecificDomain
+          bestQueryResult: bestQueryResult,
+          bestCountrySpecificResult: bestCountrySpecificResult,
+          domainName: domainName,
+          countrySpecificDomain: countrySpecificDomain,
+          user: req.user
         });
 
         // Saving Search in DB/User
@@ -238,7 +239,6 @@ router.get("/result", function(req, res, next) {
           SearchDate: date,
           SearchTime: time
         };
-
 
         allSearches.push(currentSearch);
         req.session.search = currentSearch;
