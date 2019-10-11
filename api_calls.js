@@ -12,18 +12,18 @@ let oneUSDtoEUR = () => {
     url: "https://api.exchangeratesapi.io/latest?base=USD"
   };
 
-  return axios.request(options).then(response => {
-    let conversionRate = response.data.rates.EUR;
-    return conversionRate;
-  }).catch((err) => {
-    
-  });
+  return axios
+    .request(options)
+    .then(response => {
+      let conversionRate = response.data.rates.EUR;
+      return conversionRate;
+    })
+    .catch(err => {});
 };
 
 // Gandi _________________________________________________
 
 let get_gandi_data = userInput => {
-
   const headers = {
     authorization: "Apikey " + process.env.GANDI
   };
@@ -33,54 +33,61 @@ let get_gandi_data = userInput => {
     headers: headers
   };
 
-  return axios.request(options).then(response => {
-    let responseObj = {};
+  return axios
+    .request(options)
+    .then(response => {
+      let responseObj = {};
 
-    if (response.data.products[0].status === "available") {
-
-      let endingArr = userInput.split(".")
-      responseObj = {
-        query: userInput,
-        ending: "." + endingArr[1],
-        name: "gandi",
-        data: response.data,
-        price: response.data.products[0].prices[0].price_after_taxes,
-        available: true,
-        availableHB: true,
-        redirectURL: "https://shop.gandi.net/en/domain/suggest?search=" + userInput
-      };
-    } else {
-      responseObj = {
-        query: userInput,
-        name: "gandi // not available",
-        data: response.data,
-        price: 999999,
-        available: false
-      };
-    }
-    return responseObj;
-  });
+      if (response.data.products[0].status === "available") {
+        let endingArr = userInput.split(".");
+        responseObj = {
+          query: userInput,
+          ending: "." + endingArr[1],
+          name: "gandi",
+          data: response.data,
+          price: response.data.products[0].prices[0].price_after_taxes,
+          available: true,
+          availableHB: true,
+          redirectURL:
+            "https://shop.gandi.net/en/domain/suggest?search=" + userInput
+        };
+      } else {
+        responseObj = {
+          query: userInput,
+          name: "gandi // not available",
+          data: response.data,
+          price: 999999,
+          available: false
+        };
+      }
+      return responseObj;
+    })
+    .catch(err => {
+      // console.error(err);
+      console.log("# __________________ Namesilo not availalbe/responsive");
+    });
 };
 
 // nameCom _________________________________________________
 
 let get_nameCom_data = userInput => {
-    var dataString = { domainNames: [userInput] };
+  var dataString = { domainNames: [userInput] };
 
-    var options = {
-      url: "https://api.name.com/v4/domains:checkAvailability",
-      method: "POST",
-      data: dataString,
-      auth: {
-        username: process.env.NAMECOMUSER,
-        password: process.env.NAMECOMPW
-      }
-    };
+  var options = {
+    url: "https://api.name.com/v4/domains:checkAvailability",
+    method: "POST",
+    data: dataString,
+    auth: {
+      username: process.env.NAMECOMUSER,
+      password: process.env.NAMECOMPW
+    }
+  };
 
-    let ctr = 0;
+  let ctr = 0;
 
-    let axiosCall = () => {
-      return axios.request(options)
+  let axiosCall = () => {
+    return axios
+      .request(options)
       .then(response => {
         if (ctr < 3) {
           // try three times, in case of faulty API response
@@ -90,7 +97,7 @@ let get_nameCom_data = userInput => {
             response.data.results[0].domainName === userInput &&
             response.data.results[0].purchasable === true
           ) {
-            let endingArr = userInput.split(".")
+            let endingArr = userInput.split(".");
             let responseObj = {
               query: userInput,
               ending: "." + endingArr[1],
@@ -100,7 +107,6 @@ let get_nameCom_data = userInput => {
               available: true,
               availableHB: true,
               redirectURL: "https://www.name.com/domain/search/" + userInput
-
             };
             return responseObj;
           } else {
@@ -128,47 +134,49 @@ let get_nameCom_data = userInput => {
             available: false
           };
         }
+      })
+      .catch(err => {
+        // console.error(err);
+        console.log("# __________________ Namesilo not availalbe/responsive");
       });
-    };
-    return axiosCall();
+  };
+  return axiosCall();
   // });
 };
 
 let get_namesilo_data = userInput => {
-    let ns = new NameSilo(process.env.NAMESILO);
-    let responseObj = {};
+  let ns = new NameSilo(process.env.NAMESILO);
+  let responseObj = {};
 
-    return ns
-      .checkRegisterAvailability([userInput])
-      .then(resp => {
-        
-        if (resp.available) {
-          let endingArr = userInput.split(".")
-          return (responseObj = {
-            query: userInput,
-            ending: "." + endingArr[1],
-            name: "namesilo",
-            price: parseFloat(resp.available.domain.price),//resp.available.domain.price, 
-            data: resp,
-            available: true,
-            availableHB: true,
-            redirectURL: "https://www.namesilo.com/register.php?rid=65d8839p"
-          });
-        } else {
-          return (responseObj = {
-            query: userInput,
-            name: "namesilo // not available",
-            data: resp,
-            price: 999999,
-            available: false
-          });
-        }
-      })
-      .catch(err => {
-        
-        // console.error(err);
-        console.log("# __________________ Namesilo not availalbe/responsive")
-      });
+  return ns
+    .checkRegisterAvailability([userInput])
+    .then(resp => {
+      if (resp.available) {
+        let endingArr = userInput.split(".");
+        return (responseObj = {
+          query: userInput,
+          ending: "." + endingArr[1],
+          name: "namesilo",
+          price: parseFloat(resp.available.domain.price), //resp.available.domain.price,
+          data: resp,
+          available: true,
+          availableHB: true,
+          redirectURL: "https://www.namesilo.com/register.php?rid=65d8839p"
+        });
+      } else {
+        return (responseObj = {
+          query: userInput,
+          name: "namesilo // not available",
+          data: resp,
+          price: 999999,
+          available: false
+        });
+      }
+    })
+    .catch(err => {
+      // console.error(err);
+      console.log("# __________________ Namesilo not availalbe/responsive");
+    });
   // });
 };
 
@@ -178,7 +186,6 @@ module.exports = {
   get_namesilo_data,
   oneUSDtoEUR
 };
-
 
 // EPIK _________________________________________________
 // let get_epik_data = userInput => {
@@ -256,10 +263,8 @@ module.exports = {
 
 // _________________________________________________
 
-
 // let find_alt_domains = domainSTL => {
 //   //to be continued
-
 
 //   // get nameCom overview
 //   var dataString = { keyword: domainSTL };
@@ -293,8 +298,6 @@ module.exports = {
 //     // console.log(response.data.results);
 //   });
 
-
 //   // get epik altertatives with post array
 //   // get gandi individual cheap domains
 // };
-

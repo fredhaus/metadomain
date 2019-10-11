@@ -19,3 +19,7 @@ a {
   padding: 20px;
   width: 100%;
 }
+
+.spinner{
+  display: none
+}

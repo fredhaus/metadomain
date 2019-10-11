@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const bcryptSalt = 10;
 const User = require("../models/user");
 const zxcvbn = require("zxcvbn");
+const _ = require("lodash");
 
 const passport = require("passport");
 
@@ -136,22 +137,41 @@ router.get("/admin", (req, res, next) => {
           allEndings.push(element.ending);
         }
       }
-      console.log(allEndings);
 
       for (let index = 0; index < allEndings.length; index++) {
         const element = allEndings[index];
         endingStats[element] = 0;
         for (let index = 0; index < searchesObj.length; index++) {
           const element2 = searchesObj[index];
-          if (element2.ending == element) {
-            endingStats[element.ending]++;
+          if (element2.ending === element) {
+            endingStats[element] += 1;
           }
         }
       }
 
-      console.log(endingStats)
+      totalSearchesLength = searchesObj.length
+      let nameComCount = 0
+      let gandiCount = 0
+      let nameSiloCount = 0
 
-      res.render("auth/admin", { searchesObj: searchesObj });
+      searchesObj.forEach(element => {
+        if (element.host === "nameCom"){
+          nameComCount++
+        }
+        if (element.host === "gandi"){
+          gandiCount++
+        }
+        if (element.host === "namesilo"){
+          nameSiloCount++
+        }
+      });
+
+      cheapestHost = [{host: "nameCom", nr: nameComCount},{host: "gandi", nr: gandiCount}, {host: "namesilo", nr: nameSiloCount}]
+      cheapestHostSorted = _.sortBy(cheapestHost, [{"nr" : "desc"}]);
+      
+      console.log(cheapestHostSorted)
+
+      res.render("auth/admin", { searchesObj: searchesObj , endingStats: endingStats, totalSearchesLength: totalSearchesLength, cheapestHostSorted: cheapestHostSorted})
     } else {
       // res.redirect("index", {errorMessage: "You are not authorized to acces this area"});
       res.render("index", {
