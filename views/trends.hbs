@@ -1,13 +1,38 @@
-<ul>
-    {{#each sorted}}
-    <li>Searchterm: <strong>{{this.query}}</strong></li>
-    <li>Price: {{this.price}} €</li>
-    <li>Host: {{this.name}}</li>
-    <a href={{this.redirectURL}} class="btn btn-primary" target="_blank">Check offer!</a>
-    <br>
-    <br>
-    {{/each}}
-</ul>
+<!doctype html>
+<html lang="en">
 
-<script>
-</script>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+
+    {{#each sorted}}
+    <div class="allSearchesResult">
+        <div class="card">
+            <h5 class="card-header">Domain <em>{{this.query}}</em> is available</h5>
+            <div class="card">
+                <div class="card-body">
+                    <div class="dealer">
+                        <p class="card-text">Best Dealer:</p>
+                        <h6 class="card-text">{{this.name}}</h6>
+                    </div>
+                    <div class="price">
+                        <p class="card-text">Best Price:</p>
+                        <h6 class="card-text">{{this.price}} €</h6>
+                    </div>
+                    <div class="link">
+                        <a href={{this.redirectURL}} class="btn btn-primary">Check offer!</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+
+    <script>
+    </script>

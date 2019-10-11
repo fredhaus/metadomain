@@ -1,13 +1,55 @@
-<h2> Your Previous Searches:</h2>
-
-<ul>
+<div class="landingResults">
+  <div class="headerResult">
+    <h5>Your next domain search:</h5>
+  </div>
+  <form class="userSearchInput userSearchInputNext" action="/result">
+    <div class="form-group">
+      <div class="search">
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">www.</span>
+          </div>
+          <input type="text" class="form-control" name="domainSearch" value="{{domainName}}"
+            aria-label="domainSearchQuery" aria-describedby="basic-addon1">
+        </div>
+      </div>
+    </div>
+    <button type="submit">New Search</button>
+  </form>
+</div>
+<div class="suppliers">
+  <div class="logo">
+    <img src="/img/Gandi.png">
+  </div>
+  <div class="logo">
+    <img src="/img/namesilo.png">
+  </div>
+  <div class="logo">
+    <img src="/img/namecom.png">
+  </div>
+</div>
+<h1 id="sectionHeader">Your historic search results:</h1>
+<hr class="dividerOne">
 {{#each searchesObj}}
-  <li>Searchterm: <strong>{{this.domain}}</strong></li>
-  <li>Price: {{this.price}}</li>
-  <li>Host:{{this.host}}</li>
-  <li>Date: {{this.SearchDate}} {{this.SearchTime}}</li>
-  ______________________________________________________________
+<div class="allSearchesResult">
+  <div class="card">
+    <h5 class="card-header allSearchesHeader">Search <em>{{this.domain}}</em></h5>
+    <div class="card">
+      <div class="card-body">
+        <div class="dealer">
+          <p class="card-text">Best Dealer:</p>
+          <h6 class="card-text">{{this.host}}</h6>
+        </div>
+        <div class="price">
+          <p class="card-text">Best Price:</p>
+          <h6 class="card-text">{{this.price}} €</h6>
+        </div>
+        <div class="date">
+          <p class="card-text">Search Date:</p>
+          <h6 class="card-text">{{this.SearchDate}} {{this.SearchTime}}</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {{/each}}
-</ul>
-
-      

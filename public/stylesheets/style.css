@@ -24,7 +24,7 @@ body {
 }
 .signup {
   font-weight: 700;
-  background-color: black;
+  background-color: #e87a16;
   color: white !important;
   max-width: 120px;
   text-align: center;
@@ -39,6 +39,7 @@ body {
 .card-body {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 .error-message {
   background: #f02b63;
@@ -55,7 +56,7 @@ body {
   background-color: grey;
   padding-bottom: 5%;
   margin-bottom: 20px;
-  background-image: url("../img/yong-chuan-VZ_GDBK98FQ-unsplash.jpg");
+  background-image: url("../img/yong-chuan-VZ_GDBK98FQ-unsplash_small.jpg");
   background-size: cover;
   background-repeat: no-repeat;
 }
@@ -81,6 +82,16 @@ body {
   min-width: 60%;
 }
 .userSearchInput button {
+  max-height: 40px;
+  border: none;
+  background-color: #e87a16;
+  color: white !important;
+  max-width: 120px;
+  text-align: center;
+  border-radius: 6px;
+  margin-left: 10px;
+}
+.userSearchInputNext button {
   max-height: 40px;
   border: none;
   background-color: black;
@@ -267,4 +278,126 @@ body {
   display: flex;
   justify-content: center;
 }
-
+.authLanding {
+  padding-top: 5%;
+  width: 100%;
+  background-color: grey;
+  padding-bottom: 5%;
+  margin-bottom: 20px;
+  background-image: url("../img/yong-chuan-VZ_GDBK98FQ-unsplash.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.authLanding h3 {
+  color: lightgrey !important;
+}
+.form-signin {
+  flex-wrap: nowrap;
+  margin-left: 10%;
+  padding-top: 20px;
+}
+.form-signin input {
+  max-width: 60%;
+  margin-top: 10px;
+}
+.form-signin button {
+  max-height: 40px;
+  border: none;
+  background-color: #e87a16;
+  color: white !important;
+  text-align: center;
+  border-radius: 6px;
+  margin-top: 10px;
+  max-width: 60%;
+}
+.accountNeeded {
+  margin-left: 10%;
+  margin-top: 20px;
+}
+.accountNeeded h5 {
+  color: lightgrey !important;
+  font-size: 12px !important;
+}
+.accountNeeded a {
+  border: none;
+  background-color: lightgrey;
+  color: black !important;
+  text-align: center;
+  border-radius: 6px;
+  margin-top: 10px;
+  max-width: 30%;
+  width: auto !important;
+  font-size: 12px;
+}
+.dividerOne {
+  width: 92%;
+  margin: 30px auto 20px auto;
+  height: 1px;
+  background-color: #000000;
+}
+#sectionHeader {
+  margin-left: 10%;
+  margin-top: 30px;
+  font-size: 18px;
+  font-weight: bold;
+}
+.results {
+  display: flex;
+  flex-wrap: nowrap;
+  margin-left: 10%;
+  justify-content: space-between;
+  margin-right: 10%;
+  margin-bottom: 1%;
+}
+.result {
+  max-width: 45%;
+}
+h5 em {
+  font-size: bold;
+  color: black;
+}
+.card-header {
+  font-size: 18px;
+  color: grey;
+}
+.card a {
+  max-height: 40px;
+  border: none;
+  background-color: #e87a16;
+  color: white !important;
+  text-align: center;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+.card h6 {
+  font-weight: 800;
+  font-size: bold;
+}
+.card p {
+  text-decoration-line: underline;
+}
+.landingResults {
+  padding-top: 1%;
+  width: 100%;
+  background-color: #e87a16;
+  padding-bottom: 1%;
+}
+.headerResult {
+  max-width: 50%;
+  margin-left: 10%;
+  padding-top: 10px;
+  color: black;
+}
+iframe {
+  margin-left: 10%;
+  max-width: 80% !important;
+}
+.allSearchesResult {
+  margin-left: 10%;
+  max-width: 80%;
+  margin-bottom: 1%;
+}
+.allSearchesHeader {
+  background-color: #e87a16 !important;
+  color: white !important;
+}
