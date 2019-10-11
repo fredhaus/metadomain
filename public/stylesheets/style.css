@@ -268,3 +268,7 @@ body {
   justify-content: center;
 }
 
+.adminBG{
+  background-color: grey;
+  color: green,
+}

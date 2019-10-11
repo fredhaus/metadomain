@@ -122,7 +122,7 @@ router.get("/result", function(req, res, next) {
       '"' +
       domainName +
       '" is not a valid search term. Please try again in the format of domain.ending';
-    res.render("index", { domainName, errorMessage });
+    res.render("index", { domainName: domainName, errorMessage: errorMessage, user: req.user });
   } else {
     let domainName = req.query.domainSearch;
 
