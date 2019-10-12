@@ -1,34 +1,45 @@
-<!DOCTYPE html>
-  
-<h2>STATS</h2>
-<h5>Total Searches</h5>
-  ___{{totalSearchesLength}}<br><br>
-
-<h5>Search Endings</h5>
-<ul>
-  {{#each endingStats}}
-  <li class="endingStats">{{@key}}: {{this}}</li>
-  {{/each}}
-</ul>
-<h5>Cheapest Host</h5>
-<ul>
-  {{#each cheapestHostSorted}}
-  <li>{{@key}} :{{this}}</li>
-  {{/each}}
-</ul>
-
-<br>
-<h2>ALL SESSION SEARCHES</h2>
-<ul>
-  {{#each searchesObj}}
-  <li>Searchterm: <strong>{{this.domain}}</strong></li>
-  <li>Ending: {{this.ending}}</li>
-  <li>Price: {{this.price}}</li>
-  <li>Host:{{this.host}}</li>
-  <li>Date: {{this.SearchDate}} {{this.SearchTime}}</li>
-  ______________________________________________________________
-  {{/each}}
-</ul>
+<div class="landingResults">
+  <div class="headerResult adminHeader">
+    <h5>Your User's Statistics:</h5>
+  </div>
+</div>
+<h1 id="sectionHeader">Total Searches:</h1>
+<hr class="dividerOne">
+<div class="adminResult">
+  <p>{{totalSearchesLength}} Searches</p>
+</div>
+<h1 id="sectionHeader">Search Endings</h1>
+<hr class="dividerOne">
+<div class="adminResult">
+  <ul>
+    {{#each endingStats}}
+    <li class="endingStats">{{@key}}: {{this}}</li>
+    {{/each}}
+  </ul>
+</div>
+<h1 id="sectionHeader">Cheapest Host</h1>
+<hr class="dividerOne">
+<div class="adminResult">
+  <ul>
+    {{#each cheapestHostSorted}}
+    <li>{{@key}} :{{this}}</li>
+    {{/each}}
+  </ul>
+</div>
+<h1 id="sectionHeader">All Session Searches</h1>
+<hr class="dividerOne">
+<div class="adminResult">
+  <ul>
+    {{#each searchesObj}}
+    <li>Searchterm: <strong>{{this.domain}}</strong></li>
+    <li>Ending: {{this.ending}}</li>
+    <li>Price: {{this.price}}</li>
+    <li>Host:{{this.host}}</li>
+    <li>Date: {{this.SearchDate}} {{this.SearchTime}}</li>
+    ______________________________________________________________
+    {{/each}}
+  </ul>
+</div>
 
 
 
@@ -45,66 +56,66 @@
 
 <script>
   let classData = document.getElementsByClassName("endingStats")
-  console.log("data",[...classData].forEach(e=>console.log(parseInt(e.innerHTML))))
-// set the dimensions and margins of the graph
-var width = 450
-    height = 450
-    margin = 40
+  console.log("data", [...classData].forEach(e => console.log(parseInt(e.innerHTML))))
+  // set the dimensions and margins of the graph
+  var width = 450
+  height = 450
+  margin = 40
 
-// The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
-var radius = Math.min(width, height) / 2 - margin
+  // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+  var radius = Math.min(width, height) / 2 - margin
 
-// append the svg object to the div called 'my_dataviz'
-var svg = d3.select("#my_dataviz")
-  .append("svg")
+  // append the svg object to the div called 'my_dataviz'
+  var svg = d3.select("#my_dataviz")
+    .append("svg")
     .attr("width", width)
     .attr("height", height)
-  .append("g")
+    .append("g")
     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-// Create dummy data
+  // Create dummy data
 
-let data = {a: 20, b: 20, c:30, d:8, e:12}
+  let data = { a: 20, b: 20, c: 30, d: 8, e: 12 }
 
 
-// set the color scale
-var color = d3.scaleOrdinal()
-  .domain(data)
-  .range(d3.schemeSet2);
+  // set the color scale
+  var color = d3.scaleOrdinal()
+    .domain(data)
+    .range(d3.schemeSet2);
 
-// Compute the position of each group on the pie:
-var pie = d3.pie()
-  .value(function(d) {return d.value; })
-var data_ready = pie(d3.entries(data))
-// Now I know that group A goes from 0 degrees to x degrees and so on.
+  // Compute the position of each group on the pie:
+  var pie = d3.pie()
+    .value(function (d) { return d.value; })
+  var data_ready = pie(d3.entries(data))
+  // Now I know that group A goes from 0 degrees to x degrees and so on.
 
-// shape helper to build arcs:
-var arcGenerator = d3.arc()
-  .innerRadius(0)
-  .outerRadius(radius)
+  // shape helper to build arcs:
+  var arcGenerator = d3.arc()
+    .innerRadius(0)
+    .outerRadius(radius)
 
-// Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
-svg
-  .selectAll('mySlices')
-  .data(data_ready)
-  .enter()
-  .append('path')
+  // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+  svg
+    .selectAll('mySlices')
+    .data(data_ready)
+    .enter()
+    .append('path')
     .attr('d', arcGenerator)
-    .attr('fill', function(d){ return(color(d.data.key)) })
+    .attr('fill', function (d) { return (color(d.data.key)) })
     .attr("stroke", "black")
     .style("stroke-width", "2px")
     .style("opacity", 0.7)
 
-// Now add the annotation. Use the centroid method to get the best coordinates
-svg
-  .selectAll('mySlices')
-  .data(data_ready)
-  .enter()
-  .append('text')
-  .text(function(d){ return "grp " + d.data.key})
-  .attr("transform", function(d) { return "translate(" + arcGenerator.centroid(d) + ")";  })
-  .style("text-anchor", "middle")
-  .style("font-size", 17)
+  // Now add the annotation. Use the centroid method to get the best coordinates
+  svg
+    .selectAll('mySlices')
+    .data(data_ready)
+    .enter()
+    .append('text')
+    .text(function (d) { return "grp " + d.data.key })
+    .attr("transform", function (d) { return "translate(" + arcGenerator.centroid(d) + ")"; })
+    .style("text-anchor", "middle")
+    .style("font-size", 17)
 
 
 </script>
