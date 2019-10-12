@@ -113,7 +113,7 @@ router.get("/user", (req, res, next) => {
   if (req.user) {
     searchesObj = req.user.searches;
     // res.locals.currentUser = req.user;
-    res.render("auth/user", { searchesObj: searchesObj });
+    res.render("auth/user", { user: req.user, searchesObj: searchesObj });
   } else {
     res.redirect("/login");
   }
