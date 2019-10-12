@@ -401,3 +401,11 @@ iframe {
   background-color: #e87a16 !important;
   color: white !important;
 }
+.adminHeader {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center !important;
+}
+.adminResult {
+  margin-left: 10%;
+}
