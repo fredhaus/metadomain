@@ -171,7 +171,7 @@ router.get("/admin", (req, res, next) => {
       
       console.log(cheapestHostSorted)
 
-      res.render("auth/admin", { searchesObj: searchesObj , endingStats: endingStats, totalSearchesLength: totalSearchesLength, cheapestHostSorted: cheapestHostSorted})
+      res.render("auth/admin", {user: req.user, searchesObj: searchesObj , endingStats: endingStats, totalSearchesLength: totalSearchesLength, cheapestHostSorted: cheapestHostSorted})
     } else {
       // res.redirect("index", {errorMessage: "You are not authorized to acces this area"});
       res.render("index", {
