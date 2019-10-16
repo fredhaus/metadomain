@@ -410,3 +410,26 @@ iframe {
   margin-left: 10%;
 }
 
+.txtwhite{
+  color: white
+}
+
+.centered{
+  text-align: center;
+}
+
+.bgcl{
+  background-color: white;
+  color: #000;
+}
+
+.bgclor{
+  color: #e67a29
+}
+
+.bgfooter{
+  background-color: #d3d3d3;
+  color: #787878
+}
+
+

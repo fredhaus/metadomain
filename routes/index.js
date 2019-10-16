@@ -16,7 +16,7 @@ let {
 
 let line = "_____________________________";
 
-let trends = [".top", ".xyz", ".io", ".site", ".online"];
+let trends = [".top", ".org", ".net", ".io", ".site", ".co" ,".xyz", ".online"];
 
 // Function gets array of objects as input (available suppliers) and compares their prices.
 // Then returns object of the cheapest supplier.
@@ -73,6 +73,10 @@ router.get("/trends", function(req, res, next) {
           if (element.name === "nameCom" || element.name == "namesilo") {
             newPrice = (element.price * rate).toFixed(2); // EUR price * USDtoEUR
             newPriceInt = parseFloat(newPrice);
+            
+            if(newPriceInt.toString().length){
+              newPriceInt = newPriceInt.toFixed(2)
+            }
             element.price = newPriceInt;
           }
         });
@@ -204,6 +208,9 @@ router.get("/result", function(req, res, next) {
 
         // rendering result page
         res.render("result", {
+          domainStl: domainStl,
+          bestDomainTld: domainNameArr[1],
+          ipSpecificTld: ipSpecificTld,
           bestQueryResult: bestQueryResult,
           bestCountrySpecificResult: bestCountrySpecificResult,
           domainName: domainName,

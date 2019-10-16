@@ -43,6 +43,7 @@ let get_gandi_data = userInput => {
         responseObj = {
           query: userInput,
           ending: "." + endingArr[1],
+          stl: endingArr[0],
           name: "gandi",
           data: response.data,
           price: response.data.products[0].prices[0].price_after_taxes,
@@ -101,6 +102,7 @@ let get_nameCom_data = userInput => {
             let responseObj = {
               query: userInput,
               ending: "." + endingArr[1],
+              stl: endingArr[0],
               name: "nameCom",
               data: response.data,
               price: response.data.results[0].purchasePrice,
@@ -156,6 +158,7 @@ let get_namesilo_data = userInput => {
         return (responseObj = {
           query: userInput,
           ending: "." + endingArr[1],
+          stl: endingArr[0],
           name: "namesilo",
           price: parseFloat(resp.available.domain.price), //resp.available.domain.price,
           data: resp,
