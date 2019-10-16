@@ -1,6 +1,6 @@
 <div class="landingResults">
   <div class="headerResult">
-    <h5>Your next domain search:</h5>
+    <h5 class="txtwhite">Your next domain search:</h5>
   </div>
   <form class="userSearchInput userSearchInputNext" action="/result">
     <div class="form-group">
@@ -29,11 +29,11 @@
   </div>
 </div>
 <h1 id="sectionHeader">Your historic search results:</h1>
-<hr class="dividerOne">
+<hr class="divider">
 {{#each searchesObj}}
 <div class="allSearchesResult">
   <div class="card">
-    <h5 class="card-header allSearchesHeader">Search <em>{{this.domain}}</em></h5>
+    <h5 class="card-header allSearchesHeader"><strong class="txtwhite">{{this.domain}}</strong></h5>
     <div class="card">
       <div class="card-body">
         <div class="dealer">
@@ -47,6 +47,9 @@
         <div class="date">
           <p class="card-text">Search Date:</p>
           <h6 class="card-text">{{this.SearchDate}} {{this.SearchTime}}</h6>
+        </div>
+        <div class="link">
+          <a href="/result?domainSearch={{this.domain}}" class="btn btn-primary">Check Offer Again!</a>
         </div>
       </div>
     </div>
