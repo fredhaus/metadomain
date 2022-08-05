@@ -20,7 +20,7 @@
     "hbs": "~4.0.4",
     "http-errors": "~1.6.3",
     "lodash": "^4.17.15",
-    "mongoose": "^5.7.1",
+    "mongoose": "^5.7.5",
     "morgan": "~1.9.1",
     "namesilo-domain-api": "0.0.15",
     "ngrok": "^3.2.5",
